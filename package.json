@@ -1,6 +1,6 @@
 {
   "name": "gitnest",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GitNest：GitHub REST API + 本地 Git 的桌面仓库管理工具",
   "main": "electron/main.js",
   "author": {

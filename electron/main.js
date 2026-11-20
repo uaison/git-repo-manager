@@ -755,9 +755,11 @@ function apiRequest (token, method, urlPath, body, accept) {
     }
 
     const req = https.request(options, (res) => {
-      let data = ''
-      res.on('data', (chunk) => { data += chunk })
+      // 按 Buffer 累积后再统一解码：逐块 toString 会把跨块的多字节 UTF-8 字符（中文/emoji）拆坏成乱码
+      const chunks = []
+      res.on('data', (chunk) => { chunks.push(chunk) })
       res.on('end', () => {
+        const data = Buffer.concat(chunks).toString('utf8')
         const contentType = res.headers['content-type'] || ''
         let parsed
         try {
@@ -922,9 +924,10 @@ ipcMain.handle('https:request', async (_e, { host, method, path, body, headers }
       }
     }
     const req = https.request(options, (res) => {
-      let data = ''
-      res.on('data', (chunk) => { data += chunk })
+      const chunks = []
+      res.on('data', (chunk) => { chunks.push(chunk) })
       res.on('end', () => {
+        const data = Buffer.concat(chunks).toString('utf8')
         let parsed
         try { parsed = JSON.parse(data) } catch { parsed = data }
         resolve({ status: res.statusCode, data: parsed })

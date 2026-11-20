@@ -1,6 +1,6 @@
 # 把 PRIVACY.md / EULA.md 生成的法律文档站点发布到 GitHub Pages
 #
-# 访问地址：https://uaison.github.io/gitnest/
+# 访问地址：https://uaison.github.io/git-repo-manager/
 # 前置（一次性）：仓库 Settings → Pages → Build and deployment → Source 选择「GitHub Actions」
 #
 # 触发：PRIVACY.md / EULA.md / 生成脚本或本工作流在 main 上变更时自动部署；
@@ -44,7 +44,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: deploy/gitnest
+          path: deploy/git-repo-manager
 
       - id: deployment
         uses: actions/deploy-pages@v4

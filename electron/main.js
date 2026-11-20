@@ -52,6 +52,31 @@ function migrateLegacyConfig () {
     console.warn('[config] 配置迁移失败:', e.message)
   }
 }
+
+// 产品改名迁移：把旧产品名的 userData 目录整体搬到新目录，避免升级后重新登录。
+// Electron 的 userData 默认取 package.json 的 name 字段（曾为 gitnest），
+// 也兼容早期以产品名命名的目录（GitNest）。
+function migrateProductRename () {
+  const oldNames = ['gitnest', 'GitNest']
+  try {
+    const appData = app.getPath('appData')
+    const newDir = app.getPath('userData')
+    for (const name of oldNames) {
+      const oldDir = path.join(appData, name)
+      if (!fs.existsSync(oldDir)) continue
+      if (path.resolve(oldDir) === path.resolve(newDir)) continue
+      // 新目录已存在且非空：保留更新的数据，不覆盖
+      if (fs.existsSync(newDir) && fs.readdirSync(newDir).length > 0) return
+      if (fs.existsSync(newDir)) fs.rmSync(newDir, { recursive: true, force: true })
+      fs.renameSync(oldDir, newDir)
+      console.log('[config] 已迁移产品目录:', oldDir, '->', newDir)
+      return
+    }
+  } catch (e) {
+    console.warn('[config] 产品目录迁移失败:', e.message)
+  }
+}
+migrateProductRename()
 migrateLegacyConfig()
 
 let store
@@ -626,7 +651,7 @@ function buildAppMenu () {
         },
         { type: 'separator' },
         {
-          label: '关于 GitNest',
+          label: '关于 Git Repo Manager',
           click: () => openHelp('about')
         }
       ]
@@ -649,7 +674,7 @@ function openHelp (hash = '') {
     height: 820,
     minWidth: 720,
     minHeight: 520,
-    title: 'GitNest 使用指南',
+    title: 'Git Repo Manager 使用指南',
     icon: path.join(__dirname, 'assets', 'icon.png'),
     autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, nodeIntegration: false }
@@ -717,7 +742,7 @@ function createWindow () {
 
 app.whenReady().then(() => {
   // Windows 任务栏使用独立 AppUserModelId，避免被归并到 Electron 默认图标
-  if (process.platform === 'win32') app.setAppUserModelId(isDev ? 'io.gitnest.app.dev' : 'io.gitnest.app')
+  if (process.platform === 'win32') app.setAppUserModelId(isDev ? 'io.gitrepo.app.dev' : 'io.gitrepo.app')
   ensureTokenEncrypted()
   buildAppMenu()
   createWindow()
@@ -1091,7 +1116,7 @@ ipcMain.handle('oauth:startCallbackServer', async () => {
       // 给浏览器友好的反馈页面
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
       res.end(`<!DOCTYPE html><html><body style="font-family:system-ui;padding:40px;text-align:center;background:#f6f8fa">
-        <h2>✅ GitNest 授权成功</h2>
+        <h2>✅ Git Repo Manager 授权成功</h2>
         <p>请返回应用窗口，登录会自动继续...</p>
         <script>window.close()</script></body></html>`)
 

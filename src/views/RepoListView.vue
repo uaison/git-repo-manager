@@ -3,7 +3,7 @@
     <header class="top-bar">
       <div class="brand">
         <img src="../assets/logo.png" alt="logo" class="brand-img" />
-        <span class="title">GitNest</span>
+        <span class="title">Git Repo Manager</span>
       </div>
       <div class="user-info">
         <span class="username">@{{ username }}</span>

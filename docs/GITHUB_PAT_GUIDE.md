@@ -1,8 +1,8 @@
 # GitHub Personal Access Token (PAT) 生成指南
 
-> **本文档适用于 [GitNest](https://github.com/uaison/github-desktop) 桌面应用用户**
+> **本文档适用于 [Git Repo Manager](https://github.com/uaison/git-repo-manager) 桌面应用用户**
 > 
-> GitNest 的远程仓库读写操作均通过 GitHub REST API 完成（本地提交/推送走系统 `git`）。
+> Git Repo Manager 的远程仓库读写操作均通过 GitHub REST API 完成（本地提交/推送走系统 `git`）。
 > 为此你需要一个 **Personal Access Token (PAT)** 来进行身份认证。
 
 ---
@@ -37,7 +37,7 @@ GitHub 提供两种 PAT，推荐使用 **Fine-grained Token（细粒度令牌）
 
 | 字段 | 填写建议 |
 |------|----------|
-| **Token name** | `GitNest`（随便写，自己认得就行） |
+| **Token name** | `Git Repo Manager`（随便写，自己认得就行） |
 | **Expiration** | 建议 `90 days` 或自定义；也可选 `No expiration` 但**有安全风险** |
 | **Resource owner** | 选你自己的用户名（个人账号）或你的组织 |
 
@@ -48,7 +48,7 @@ GitHub 提供两种 PAT，推荐使用 **Fine-grained Token（细粒度令牌）
 | **Only select repositories** | ✅ **推荐**，只勾你要管理的仓库 |
 | **All repositories** | 确认无误再选，权限过大 |
 
-> 💡 如果你只想用 GitNest 操作少数仓库，选第一个，然后点进去具体勾哪些。
+> 💡 如果你只想用 Git Repo Manager 操作少数仓库，选第一个，然后点进去具体勾哪些。
 
 ### 5. 选择权限（关键步骤）
 
@@ -72,7 +72,7 @@ Actions:               No access       ← 不用开
 
 > ⚠️ **最小必需 = Contents (R/W) + Metadata (R)**
 > 
-> 如果你只是用 GitNest 浏览和编辑代码，这两项够了。
+> 如果你只是用 Git Repo Manager 浏览和编辑代码，这两项够了。
 
 ### 6. 生成 Token
 
@@ -88,7 +88,7 @@ github_pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 （上行为示意，请勿把他人的真实令牌粘贴到此处）
 
-> 📋 立即复制到剪贴板 → 打开 GitNest → 粘贴到登录页的 Token 输入框 → 回车登录
+> 📋 立即复制到剪贴板 → 打开 Git Repo Manager → 粘贴到登录页的 Token 输入框 → 回车登录
 
 ---
 
@@ -98,7 +98,7 @@ github_pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 1. 访问 [https://github.com/settings/tokens](https://github.com/settings/tokens)
 2. 点 **Generate new token (classic)**
-3. 填写 Note 如 `GitNest`，选 Expiration
+3. 填写 Note 如 `Git Repo Manager`，选 Expiration
 4. 勾选权限（最简单粗暴）：
 
 ```
@@ -121,7 +121,7 @@ github_pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 1. 立刻到 [https://github.com/settings/tokens](https://github.com/settings/tokens)
 2. 找到泄露的 Token，右侧点 **Delete**
 3. 按本指南重新生成一个新的
-4. 打开 GitNest → 点右上角 **退出** → 重新用新 Token 登录
+4. 打开 Git Repo Manager → 点右上角 **退出** → 重新用新 Token 登录
 
 > 🔒 最佳实践：
 > - Token 只保存在本机，并用系统凭据（Windows DPAPI）加密后落盘，不以明文存储
@@ -130,11 +130,11 @@ github_pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ---
 
-## 五、GitNest 里怎么用
+## 五、Git Repo Manager 里怎么用
 
 ### 首次启动
 
-1. 双击 **GitNest 1.0.0.exe**（便携版）或 **GitNest Setup 1.0.0.exe**（安装版）
+1. 双击 **Git Repo Manager 1.0.0.exe**（便携版）或 **Git Repo Manager Setup 1.0.0.exe**（安装版）
 2. 进入登录页
 3. 把刚才复制的 Token 粘贴进去
 4. 点 **登录并验证**
@@ -142,7 +142,7 @@ github_pat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ### 后续启动
 
-Token 已经加密保存在本地（`%APPDATA%\gitnest\`），下次启动自动登录，不用再输。
+Token 已经加密保存在本地（`%APPDATA%\git-repo-manager\`），下次启动自动登录，不用再输。
 
 ### 换 Token / 退出登录
 
@@ -170,7 +170,7 @@ A: 检查：
 
 ### Q: Token 过期了怎么办？
 
-A: GitNest 会在下次请求时报 401，你需要：
+A: Git Repo Manager 会在下次请求时报 401，你需要：
 1. 到 Settings → Tokens 里删除旧的（如果还在）
 2. 重新 Generate 一个
 3. 在应用里退出登录 → 粘贴新 Token
@@ -183,7 +183,7 @@ A: GitHub 从 2021 年开始**已经彻底禁用密码身份认证**。现在所
 
 ## 七、权限最小对照表
 
-下面是 GitNest 各项功能需要的**最小权限**清单，按需勾选即可：
+下面是 Git Repo Manager 各项功能需要的**最小权限**清单，按需勾选即可：
 
 | 功能 | 权限 |
 |------|------|
@@ -196,8 +196,8 @@ A: GitHub 从 2021 年开始**已经彻底禁用密码身份认证**。现在所
 | 🐛 Issue 管理 | Issues (Write) |
 | 🔀 PR 管理 | Pull requests (Write) |
 
-> **一句话总结：Contents (Read and Write) + Metadata (Read)** = 能完成 GitNest 的全部核心功能。
+> **一句话总结：Contents (Read and Write) + Metadata (Read)** = 能完成 Git Repo Manager 的全部核心功能。
 
 ---
 
-*Last updated: 2026-11-18 · 适配 GitNest v1.0.0*
+*Last updated: 2026-11-18 · 适配 Git Repo Manager v1.0.0*

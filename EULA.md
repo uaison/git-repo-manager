@@ -1,9 +1,9 @@
-# GitNest 最终用户许可协议（EULA）
+# Git Repo Manager 最终用户许可协议（EULA）
 
 > 生效日期：2026 年 11 月 20 日
 > 许可方：Uaison（王淮森）
 
-感谢您使用 GitNest（以下简称「本软件」）。在安装或使用本软件前，请仔细阅读本协议。
+感谢您使用 Git Repo Manager（以下简称「本软件」）。在安装或使用本软件前，请仔细阅读本协议。
 一旦您安装、复制或以其他方式使用本软件，即视为您已同意受本协议条款约束。
 如不同意，请勿安装或使用，并请删除本软件的全部副本。
 
@@ -13,14 +13,14 @@
    再分发（含商业使用）以及就相关专利的授权；该等授权永久且不可撤销。
 2. 再分发时须遵守 Apache-2.0 第 4 条：保留本软件的版权声明与 `LICENSE` 文本，保留 `NOTICE`
    文件内容，并在被修改的文件中显著注明您作过修改。
-3. 依 Apache-2.0 第 6 条，本协议不授予任何商标或品牌使用权：您不得以「GitNest」名义发布修改版，
+3. 依 Apache-2.0 第 6 条，本协议不授予任何商标或品牌使用权：您不得以「Git Repo Manager」名义发布修改版，
    也不得暗示许可方为您的衍生作品背书。
 4. 您不得将本软件用于任何违法目的，或违反 GitHub 等第三方服务条款的用途。
 
 ## 二、知识产权
 
 1. 本软件的著作权归许可方所有。
-2. 「GitNest」名称与应用图标为许可方的标识，不在 Apache-2.0 的授权范围内。
+2. 「Git Repo Manager」名称与应用图标为许可方的标识，不在 Apache-2.0 的授权范围内。
 3. 本软件包含第三方开源组件（Electron、Chromium、Node.js 及若干 npm 依赖），
    其知识产权归各自权利人所有，相关许可见本软件「帮助 → 关于 → 第三方许可」及安装目录中的
    `LICENSES.chromium.html`、`LICENSE.electron.txt`。
@@ -67,8 +67,8 @@
 ## 九、联系方式
 
 - 邮箱：752546024@qq.com
-- 在线版本：[https://uaison.github.io/gitnest/eula.html](https://uaison.github.io/gitnest/eula.html)
-- 项目地址：[https://github.com/uaison/gitnest](https://github.com/uaison/gitnest)
+- 在线版本：[https://uaison.github.io/git-repo-manager/eula.html](https://uaison.github.io/git-repo-manager/eula.html)
+- 项目地址：[https://github.com/uaison/git-repo-manager](https://github.com/uaison/git-repo-manager)
 
 ---
 

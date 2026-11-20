@@ -67,7 +67,7 @@ const entries = [...seen.values()].sort((a, b) =>
 
 let md = `# Third-Party Notices / 第三方许可声明
 
-本应用（GitNest）包含下列第三方开源组件。这些组件**随应用一起分发**（生产依赖及其传递依赖），
+本应用（Git Repo Manager）包含下列第三方开源组件。这些组件**随应用一起分发**（生产依赖及其传递依赖），
 各自受其原始许可条款约束。以下列出每个组件的名称、版本、许可类型与许可全文。
 
 Electron / Chromium / Node.js 的许可文本见安装目录中的 \`LICENSES.chromium.html\` 与

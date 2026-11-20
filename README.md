@@ -1,4 +1,4 @@
-# GitNest
+# Git Repo Manager
 
 > 纯 GitHub REST API + 本地 Git 的桌面仓库管理工具 · 版本 1.0.0 · Apache-2.0
 
@@ -8,7 +8,7 @@
 但 **HTTPS 访问 `api.github.com` 是可行的**。此时命令行 `git clone` / `git push` 会长时间卡住或直接失败，
 官方 GitHub Desktop 因为强依赖本地 git 网络协议，同样无法完成操作。
 
-GitNest 正是为这种场景设计：
+Git Repo Manager 正是为这种场景设计：
 
 - **能走 API 的走 API**：仓库浏览、文件读写、在线提交全部经 GitHub REST API（443），不依赖 git 协议端口。
 - **该落地的落地**：下载 zip 后初始化真实 Git 仓库，之后的提交 / 推送 / 拉取 / 分支走系统 `git`，历史真实可查。
@@ -32,7 +32,7 @@ GitNest 正是为这种场景设计：
 ## 🚀 快速开始
 
 ```bash
-cd gitnest
+cd git-repo-manager
 npm install            # 需要 Node 18+
 npm run dev            # 开发模式（Vite + Electron）
 npm run build          # 构建渲染层
@@ -43,8 +43,8 @@ npm run build:win      # 打包 Windows（NSIS 安装包 + 便携版）
 
 | 文件 | 用途 |
 |------|------|
-| `GitNest Setup 1.0.0.exe` | 安装版（可选目录、创建快捷方式、可卸载） |
-| `GitNest 1.0.0.exe` | 便携版（单文件，不写注册表） |
+| `Git Repo Manager Setup 1.0.0.exe` | 安装版（可选目录、创建快捷方式、可卸载） |
+| `Git Repo Manager 1.0.0.exe` | 便携版（单文件，不写注册表） |
 | `win-unpacked/` | 绿色目录，直接运行其中的 exe |
 
 ## 🔑 三种登录方式
@@ -83,7 +83,7 @@ npm run build:win      # 打包 Windows（NSIS 安装包 + 便携版）
 ## 🏗️ 架构
 
 ```
-gitnest/
+git-repo-manager/
 ├── electron/
 │   ├── main.js        # 主进程：GitHub API、文件系统、git 执行、IPC、菜单
 │   ├── preload.js     # contextBridge 暴露最小接口

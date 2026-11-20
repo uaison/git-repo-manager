@@ -1,4 +1,4 @@
-# One-shot sideload install/verify for the GitNest MSIX on a NORMAL Windows 11 machine.
+# One-shot sideload install/verify for the Git Repo Manager MSIX on a NORMAL Windows 11 machine.
 #
 # Why a script: the dev machine used to build this package is a trimmed Windows image
 # with no Msixvc service, so Add-AppxPackage hangs there. Run this on a normal Win11.
@@ -25,9 +25,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-if (-not $MsixPath) { $MsixPath = Join-Path $root 'release\GitNest 1.0.0.msix' }
-if (-not $CerPath)  { $CerPath  = Join-Path $root 'certs\GitNestDev.cer' }
-$pkgName = 'GitNest.GitNest'
+if (-not $MsixPath) { $MsixPath = Join-Path $root 'release\Git Repo Manager 1.0.0.msix' }
+if (-not $CerPath)  { $CerPath  = Join-Path $root 'certs\GitRepoManagerDev.cer' }
+$pkgName = 'uaison.GitRepoManager'
 
 function Test-Admin {
   $id = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -80,7 +80,7 @@ Write-Host '=== installed ==='
 $pkg | Select-Object Name, PackageFullName, Version, InstallLocation | Format-List
 
 if (-not $NoLaunch) {
-  $aumid = "$($pkg.PackageFamilyName)!GitNest"
+  $aumid = "$($pkg.PackageFamilyName)!GitRepoManager"
   Write-Host "=== launch: shell:AppsFolder\$aumid ==="
   Start-Process "shell:AppsFolder\$aumid"
   Write-Host 'launched. Verify the window renders, then re-run with -Uninstall to clean up.'

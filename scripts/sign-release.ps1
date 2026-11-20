@@ -1,26 +1,26 @@
-# Code-signing helper for GitNest release artifacts.
+# Code-signing helper for Git Repo Manager release artifacts.
 #
 # When to use:
-#   - after-pack.js signs the app exe during the build (only if GITNEST_SIGN_* is set).
+#   - after-pack.js signs the app exe during the build (only if GRM_SIGN_* is set).
 #   - run THIS script AFTER `npm run build:win` to sign the NSIS installer + portable exe,
 #     because win.signAndEditExecutable=false leaves them unsigned.
 #
 # Certificate source (pick ONE):
 #   A) cert already in a store:  -CertSubject "CN=Your Company, Inc."   (recommended for OV/EV)
-#   B) a PFX file:               -PfxPath certs\release.pfx  (+ password via $env:GITNEST_PFX_PASS or -PfxPassword)
+#   B) a PFX file:               -PfxPath certs\release.pfx  (+ password via $env:GRM_PFX_PASS or -PfxPassword)
 #
 # For a REAL public release use a trusted OV/EV code-signing cert (or Azure Trusted Signing).
-# The self-signed dev cert (CN=GitNest Dev Test) is for sideload testing ONLY.
+# The self-signed dev cert (CN=Git Repo Manager Dev Test) is for sideload testing ONLY.
 #
 # Examples:
-#   powershell -ExecutionPolicy Bypass -File scripts\sign-release.ps1 -CertSubject "CN=GitNest Dev Test"
-#   $env:GITNEST_PFX_PASS='...'; powershell -ExecutionPolicy Bypass -File scripts\sign-release.ps1 -PfxPath certs\release.pfx
+#   powershell -ExecutionPolicy Bypass -File scripts\sign-release.ps1 -CertSubject "CN=Git Repo Manager Dev Test"
+#   $env:GRM_PFX_PASS='...'; powershell -ExecutionPolicy Bypass -File scripts\sign-release.ps1 -PfxPath certs\release.pfx
 #
 # ASCII-only on purpose (PS5 reads .ps1 with the ANSI codepage).
 param(
   [string]$CertSubject,
   [string]$PfxPath,
-  [string]$PfxPassword = $env:GITNEST_PFX_PASS,
+  [string]$PfxPassword = $env:GRM_PFX_PASS,
   [string]$Timestamp = 'http://timestamp.digicert.com',
   [string[]]$Target,
   [switch]$WhatIf
@@ -47,14 +47,14 @@ function Find-SignTool {
 if (-not $Target -or $Target.Count -eq 0) {
   $Target = @()
   $Target += Get-ChildItem $release -Filter '*.exe' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
-  $unp = Join-Path $release 'win-unpacked\GitNest.exe'
+  $unp = Join-Path $release 'win-unpacked\Git Repo Manager.exe'
   if (Test-Path $unp) { $Target += $unp }
 }
 $Target = $Target | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
 if (-not $Target) { throw "no .exe targets found under $release ; run build:win first" }
 
 if (-not $CertSubject -and -not $PfxPath) {
-  throw 'specify -CertSubject "CN=..." or -PfxPath <file> (PFX password via $env:GITNEST_PFX_PASS or -PfxPassword)'
+  throw 'specify -CertSubject "CN=..." or -PfxPath <file> (PFX password via $env:GRM_PFX_PASS or -PfxPassword)'
 }
 
 $signtool = Find-SignTool

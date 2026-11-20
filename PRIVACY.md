@@ -4,7 +4,7 @@
 > 开发者/运营方：Uaison（王淮森）
 > 联系方式：752546024@qq.com
 
-本隐私政策说明 GitNest（以下简称「本应用」）在收集、使用、存储和保护用户信息方面的做法。
+本隐私政策说明 Git Repo Manager（以下简称「本应用」）在收集、使用、存储和保护用户信息方面的做法。
 请仔细阅读。本应用为纯客户端桌面工具，**不依赖任何自建后端服务器**，因此数据处理范围极其有限。
 
 ## 一、信息收集
@@ -49,9 +49,9 @@
 
 配置文件（含加密后的 Token、仓库列表、偏好设置）保存在：
 
-- Windows：`%APPDATA%\gitnest\`
-- macOS：`~/Library/Application Support/gitnest/`
-- Linux：`~/.config/gitnest/`
+- Windows：`%APPDATA%\git-repo-manager\`
+- macOS：`~/Library/Application Support/git-repo-manager/`
+- Linux：`~/.config/git-repo-manager/`
 
 **卸载本应用不会自动删除这些配置**。如需彻底清除，请手动删除上述目录。
 
@@ -68,5 +68,5 @@
 如对本隐私政策有任何疑问、意见或建议，请通过以下方式联系：
 
 - 邮箱：752546024@qq.com
-- 在线版本：[https://uaison.github.io/gitnest/privacy.html](https://uaison.github.io/gitnest/privacy.html)
-- 项目地址：[https://github.com/uaison/gitnest](https://github.com/uaison/gitnest)
+- 在线版本：[https://uaison.github.io/git-repo-manager/privacy.html](https://uaison.github.io/git-repo-manager/privacy.html)
+- 项目地址：[https://github.com/uaison/git-repo-manager](https://github.com/uaison/git-repo-manager)

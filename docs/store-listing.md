@@ -1,4 +1,4 @@
-# GitNest 微软商店上架素材（草稿）
+# Git Repo Manager 微软商店上架素材（草稿）
 
 > 用途：Partner Center 提交时的商店列表（Store listing）内容草稿。
 > 标注「待补」的项需要开发者提供或操作。
@@ -7,14 +7,14 @@
 
 | 项 | 值 |
 |---|---|
-| 应用名称 | GitNest |
-| 包 Identity Name | uaison.GitNest |
+| 应用名称 | Git Repo Manager |
+| 包 Identity Name | uaison.GitRepoManager |
 | 包 Identity Publisher | CN=8D2E8A55-A948-4001-94F4-D7FC476668EF |
-| Package Family Name (PFN) | uaison.GitNest_f8m7w7s4r8ytw |
-| Package SID | S-1-15-2-1297251991-1824868847-2301578359-1512367143-1867700970-4134317892-779548683 |
+| Package Family Name (PFN) | uaison.GitRepoManager_f8m7w7s4r8ytw |
+| Package SID | S-1-15-2-797677598-1373881817-1074810386-3926820018-3990037754-166887501-3536263893 |
 | 账号类型 | 个人（个人主体，需政府证件 + 自拍实名认证） |
 | 发布者显示名 | uaison |
-| appId | io.gitnest.app |
+| appId | io.gitrepo.app |
 | 类别 | Developer tools（开发者工具） |
 | 支持平台 | Windows 10 版本 17763.0+ / Windows 11，x64 |
 | 支持语言 | 简体中文 (zh-CN)、English (en-US) |
@@ -30,7 +30,7 @@
 
 **zh-CN**
 
-GitNest 是一款基于 Electron 的开源 GitHub 桌面客户端，将 GitHub REST API 与本地 Git 操作整合到统一的桌面体验中。
+Git Repo Manager 是一款基于 Electron 的开源 GitHub 桌面客户端，将 GitHub REST API 与本地 Git 操作整合到统一的桌面体验中。
 
 - 三种登录方式：粘贴 Personal Access Token、设备码（Device Flow）、浏览器 OAuth 授权。
 - 仓库管理：浏览、克隆、导入本地仓库，查看提交历史与分支。
@@ -40,7 +40,7 @@ GitNest 是一款基于 Electron 的开源 GitHub 桌面客户端，将 GitHub R
 
 **en-US**
 
-GitNest is an open-source GitHub desktop client built with Electron, unifying the GitHub REST API and local Git operations in one place.
+Git Repo Manager is an open-source GitHub desktop client built with Electron, unifying the GitHub REST API and local Git operations in one place.
 
 - Three sign-in methods: Personal Access Token, Device Flow, and browser OAuth.
 - Repo management: browse, clone, import local repositories, view commit history and branches.
@@ -72,18 +72,18 @@ GitHub · Git · 版本控制 · 仓库管理 · desktop client · 开源 · 代
 
 ## 七、合规链接
 
-- **隐私政策 URL**：`https://uaison.github.io/gitnest/privacy.html`（商店必填，需保持公开可匿名访问）
-- 用户许可协议 URL：`https://uaison.github.io/gitnest/eula.html`
+- **隐私政策 URL**：`https://uaison.github.io/git-repo-manager/privacy.html`（商店必填，需保持公开可匿名访问）
+- 用户许可协议 URL：`https://uaison.github.io/git-repo-manager/eula.html`
 - 支持 / 联系邮箱：752546024@qq.com
 - 许可：Apache License 2.0（见 `LICENSE` 与 `NOTICE`）
 - **代码签名证书**：走商店分发**无需自购**，认证通过后由微软免费重签。
 
 ## 八、提交前检查清单
 
-- [ ] Partner Center 账号已注册（`storedeveloper.microsoft.com`，新流程个人/公司均免注册费）并保留应用名称 `GitNest`
-- [ ] 把 `appx.identityName` / `appx.publisher` 换成 Partner Center 的 `Package/Identity` 值后重新构建 MSIX（当前 `CN=ms` 是占位，直接提交会因 Identity 不匹配被拒）
-- [x] 隐私政策公开 URL 已就绪：`https://uaison.github.io/gitnest/privacy.html`（由 `.github/workflows/pages.yml` 自动部署，需在仓库 Settings → Pages 选择 GitHub Actions 作为源）
+- [ ] Partner Center 账号已注册（`storedeveloper.microsoft.com`，新流程个人/公司均免注册费）并保留应用名称 `Git Repo Manager`
+- [x] `appx.identityName` / `appx.publisher` 已填入 Partner Center 的 `Package/Identity` 值并重新构建 MSIX
+- [x] 隐私政策公开 URL 已就绪：`https://uaison.github.io/git-repo-manager/privacy.html`（由 `.github/workflows/pages.yml` 自动部署，需在仓库 Settings → Pages 选择 GitHub Actions 作为源）
 - [ ] 至少 1 张应用截图
 - [ ] IARC 年龄分级问卷已完成
-- [ ] 上传 MSIX：`release/GitNest 1.0.0.msix`（未签名包，提交后由商店免费重签）
+- [ ] 上传 MSIX：`release/Git Repo Manager 1.0.0.msix`（未签名包，提交后由商店免费重签）
 - [ ] 商店列表各语言文案已填写

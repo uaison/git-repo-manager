@@ -4,6 +4,7 @@ node_modules/
 # build output
 dist/
 release/
+deploy/
 
 # dev / signing artifacts (must never be committed)
 certs/

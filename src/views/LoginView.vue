@@ -4,7 +4,7 @@
       <div class="logo">
         <img src="../assets/logo.png" alt="logo" class="logo-img" />
       </div>
-      <h1>GitNest</h1>
+      <h1>Git Repo Manager</h1>
       <p class="subtitle">选择一种登录方式开始使用</p>
 
       <!-- 登录失效提示 -->
@@ -154,7 +154,7 @@
 
         <p class="modal-tip">
           注册 OAuth App 时：<br>
-          • Application name: 随便写，如 GitNest<br>
+          • Application name: 随便写，如 Git Repo Manager<br>
           • Homepage URL: <code>https://github.com</code><br>
           • Authorization callback URL: <code>http://127.0.0.1:8765/callback</code>
         </p>

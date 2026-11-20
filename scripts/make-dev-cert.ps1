@@ -6,18 +6,18 @@
 # using the system ANSI codepage; non-ASCII (e.g. UTF-8 Chinese) without a BOM
 # gets mangled and breaks the parser.
 param(
-  [string]$Subject = "CN=GitNest Dev Test",
+  [string]$Subject = "CN=Git Repo Manager Dev Test",
   [string]$CertDir  = "certs",
-  [string]$PfxPassword = $env:GITNEST_PFX_PASS
+  [string]$PfxPassword = $env:GRM_PFX_PASS
 )
 
 $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $certDir = Join-Path $projectRoot $CertDir
 New-Item -ItemType Directory -Force $certDir | Out-Null
-$pfxPath = Join-Path $certDir "GitNestDev.pfx"
+$pfxPath = Join-Path $certDir "GitRepoManagerDev.pfx"
 
-if (-not $PfxPassword) { $PfxPassword = "gitnest-dev" }
+if (-not $PfxPassword) { $PfxPassword = "grm-dev" }
 
 # Remove any prior cert with the same subject to avoid duplicates.
 Get-ChildItem "Cert:\CurrentUser\My" | Where-Object { $_.Subject -eq $Subject } | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -30,7 +30,7 @@ $cert = New-SelfSignedCertificate `
   -KeyUsage DigitalSignature `
   -KeyAlgorithm RSA `
   -KeyLength 2048 `
-  -FriendlyName "GitNest Dev Test" `
+  -FriendlyName "Git Repo Manager Dev Test" `
   -CertStoreLocation "Cert:\CurrentUser\My" `
   -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3")
 
@@ -67,7 +67,7 @@ Write-Host "[cert] self-signed code-signing certificate created"
 Write-Host "  Subject   : $($cert.Subject)"
 Write-Host "  Thumbprint: $($cert.Thumbprint)"
 Write-Host "  PFX       : $pfxPath"
-$src = if ($env:GITNEST_PFX_PASS) { "env GITNEST_PFX_PASS" } else { "default gitnest-dev (override with GITNEST_PFX_PASS)" }
+$src = if ($env:GRM_PFX_PASS) { "env GRM_PFX_PASS" } else { "default grm-dev (override with GRM_PFX_PASS)" }
 Write-Host "  Password  : $src"
 Write-Host ""
 Write-Host "Sideload requires Developer Mode or 'Allow sideload apps' to be enabled."

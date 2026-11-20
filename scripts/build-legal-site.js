@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 把 PRIVACY.md / EULA.md 生成为可公开托管的静态 HTML（deploy/gitnest/）。
+ * 把 PRIVACY.md / EULA.md 生成为可公开托管的静态 HTML（deploy/git-repo-manager/）。
  *
  * 特性：
  * - 零依赖：仅支持文档实际用到的 Markdown 子集（标题 / 段落 / 有序无序列表 / 嵌套列表 / 引用块 / 粗体 / 行内代码 / 链接）
@@ -12,20 +12,20 @@ const fs = require('fs')
 const path = require('path')
 
 const ROOT = path.resolve(__dirname, '..')
-const OUT_DIR = path.join(ROOT, 'deploy', 'gitnest')
+const OUT_DIR = path.join(ROOT, 'deploy', 'git-repo-manager')
 
 const DOCS = [
   {
     src: 'PRIVACY.md',
     file: 'privacy.html',
-    title: 'GitNest 隐私政策',
-    description: 'GitNest 隐私政策：纯客户端桌面工具，不收集、不上传用户数据。'
+    title: 'Git Repo Manager 隐私政策',
+    description: 'Git Repo Manager 隐私政策：纯客户端桌面工具，不收集、不上传用户数据。'
   },
   {
     src: 'EULA.md',
     file: 'eula.html',
-    title: 'GitNest 最终用户许可协议',
-    description: 'GitNest 最终用户许可协议：安装与使用本软件所适用的许可条款。'
+    title: 'Git Repo Manager 最终用户许可协议',
+    description: 'Git Repo Manager 最终用户许可协议：安装与使用本软件所适用的许可条款。'
   }
 ]
 
@@ -295,7 +295,7 @@ function docPage ({ title, description, docTitle, meta, body }) {
   ${body}
 </main>
 
-<footer>GitNest ｜ 本页面为 ${escapeHtml(docTitle)} 的公开发布版本</footer>
+<footer>Git Repo Manager ｜ 本页面为 ${escapeHtml(docTitle)} 的公开发布版本</footer>
 </body>
 </html>
 `
@@ -307,8 +307,8 @@ function indexPage (effectiveDate) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GitNest 法律文档</title>
-<meta name="description" content="GitNest 隐私政策与最终用户许可协议。">
+<title>Git Repo Manager 法律文档</title>
+<meta name="description" content="Git Repo Manager 隐私政策与最终用户许可协议。">
 <style>
   :root {
     --fg: #1f2328;
@@ -358,7 +358,7 @@ function indexPage (effectiveDate) {
 </head>
 <body>
 <div class="wrap">
-  <h1>GitNest 法律文档</h1>
+  <h1>Git Repo Manager 法律文档</h1>
   <p class="sub">开发者/运营方：Uaison（王淮森） ｜ 联系：<a href="mailto:752546024@qq.com">752546024@qq.com</a></p>
 
   <div class="cards">
@@ -401,11 +401,11 @@ function main () {
       body: parsed.body
     })
     fs.writeFileSync(path.join(OUT_DIR, doc.file), html, 'utf8')
-    console.log(`生成 deploy/gitnest/${doc.file}`)
+    console.log(`生成 deploy/git-repo-manager/${doc.file}`)
   }
 
   fs.writeFileSync(path.join(OUT_DIR, 'index.html'), indexPage(effectiveDate || ''), 'utf8')
-  console.log('生成 deploy/gitnest/index.html')
+  console.log('生成 deploy/git-repo-manager/index.html')
 }
 
 main()

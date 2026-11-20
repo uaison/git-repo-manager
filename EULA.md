@@ -63,7 +63,8 @@
 ## 九、联系方式
 
 - 邮箱：752546024@qq.com
-- 项目地址：（暂未发布公开仓库）
+- 在线版本：[https://uaison.github.io/gitnest/eula.html](https://uaison.github.io/gitnest/eula.html)
+- 项目地址：[https://github.com/uaison/gitnest](https://github.com/uaison/gitnest)
 
 ---
 

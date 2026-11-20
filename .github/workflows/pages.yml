@@ -1,0 +1,50 @@
+# 把 PRIVACY.md / EULA.md 生成的法律文档站点发布到 GitHub Pages
+#
+# 访问地址：https://uaison.github.io/gitnest/
+# 前置（一次性）：仓库 Settings → Pages → Build and deployment → Source 选择「GitHub Actions」
+#
+# 触发：PRIVACY.md / EULA.md / 生成脚本或本工作流在 main 上变更时自动部署；
+#       也可在 Actions 页面手动 Run workflow。
+
+name: Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'PRIVACY.md'
+      - 'EULA.md'
+      - 'scripts/build-legal-site.js'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 生成法律文档页面
+        run: node scripts/build-legal-site.js
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy/gitnest
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

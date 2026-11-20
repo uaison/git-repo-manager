@@ -68,4 +68,5 @@
 如对本隐私政策有任何疑问、意见或建议，请通过以下方式联系：
 
 - 邮箱：752546024@qq.com
-- 项目地址：（暂未发布公开仓库）
+- 在线版本：[https://uaison.github.io/gitnest/privacy.html](https://uaison.github.io/gitnest/privacy.html)
+- 项目地址：[https://github.com/uaison/gitnest](https://github.com/uaison/gitnest)

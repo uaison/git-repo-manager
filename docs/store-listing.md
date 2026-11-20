@@ -69,8 +69,8 @@ GitHub · Git · 版本控制 · 仓库管理 · desktop client · 开源 · 代
 
 ## 七、合规链接
 
-- **隐私政策 URL**：`https://uaison.top/gitnest/privacy.html`（商店必填，需保持公开可匿名访问）
-- 用户许可协议 URL：`https://uaison.top/gitnest/eula.html`
+- **隐私政策 URL**：`https://uaison.github.io/gitnest/privacy.html`（商店必填，需保持公开可匿名访问）
+- 用户许可协议 URL：`https://uaison.github.io/gitnest/eula.html`
 - 支持 / 联系邮箱：752546024@qq.com
 - 许可：MIT（见 `LICENSE`）
 - **代码签名证书**：走商店分发**无需自购**，认证通过后由微软免费重签。
@@ -79,7 +79,7 @@ GitHub · Git · 版本控制 · 仓库管理 · desktop client · 开源 · 代
 
 - [ ] Partner Center 账号已注册（`storedeveloper.microsoft.com`，新流程个人/公司均免注册费）并保留应用名称 `GitNest`
 - [ ] 把 `appx.identityName` / `appx.publisher` 换成 Partner Center 的 `Package/Identity` 值后重新构建 MSIX（当前 `CN=ms` 是占位，直接提交会因 Identity 不匹配被拒）
-- [x] 隐私政策公开 URL 已就绪：`https://uaison.top/gitnest/privacy.html`
+- [x] 隐私政策公开 URL 已就绪：`https://uaison.github.io/gitnest/privacy.html`（由 `.github/workflows/pages.yml` 自动部署，需在仓库 Settings → Pages 选择 GitHub Actions 作为源）
 - [ ] 至少 1 张应用截图
 - [ ] IARC 年龄分级问卷已完成
 - [ ] 上传 MSIX：`release/GitNest 1.0.0.msix`（未签名包，提交后由商店免费重签）

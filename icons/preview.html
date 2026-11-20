@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>OctoDesk · Windows 应用图标设计规范</title>
+<style>
+  :root{
+    --bg:#F6F7FB; --card:#FFFFFF; --ink:#1B1F2A; --sub:#5B6270; --line:#E4E7EE;
+    --violet:#453370; --violet-2:#8B5CF6; --green:#3FD070; --green-2:#86EFAC;
+    --glyph:#EDF2F9; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+       line-height:1.6;padding:48px 24px 80px}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:30px;margin:0 0 6px;letter-spacing:.5px}
+  .lead{color:var(--sub);margin:0 0 36px}
+  h2{font-size:19px;margin:44px 0 14px;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:8px;height:20px;border-radius:4px;
+             background:linear-gradient(180deg,var(--violet-2),var(--violet))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+        padding:28px;box-shadow:0 1px 3px rgba(20,24,40,.05)}
+  .hero{display:flex;gap:40px;align-items:center;flex-wrap:wrap}
+  .hero img.big{width:220px;height:220px;border-radius:24px;
+        box-shadow:0 18px 40px rgba(45,28,90,.35);flex:none}
+  .concept{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;flex:1;min-width:420px}
+  .concept div{border:1px dashed var(--line);border-radius:12px;padding:14px 16px}
+  .concept b{display:block;margin-bottom:2px}
+  .concept span{font-size:13px;color:var(--sub)}
+  .ladder{display:flex;align-items:flex-end;gap:36px;flex-wrap:wrap}
+  .ladder figure{margin:0;text-align:center}
+  .ladder img{display:block;image-rendering:auto;margin:0 auto 10px;
+        border-radius:8px;box-shadow:0 6px 16px rgba(20,24,40,.18)}
+  .ladder img.px16{box-shadow:none;border:1px solid var(--line);border-radius:3px}
+  .ladder figcaption{font-size:12px;color:var(--sub)}
+  .tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;
+       background:#EEF0F7;color:#5B6270;margin-top:4px}
+  .ctx{display:flex;flex-direction:column;gap:18px}
+  .bar{border-radius:12px;padding:10px 18px;display:flex;align-items:center;gap:14px}
+  .bar .win{margin-left:auto;display:flex;gap:14px;opacity:.55}
+  .bar .win span{font-size:13px}
+  .bar.dark{background:#101318;color:#C9D1D9}
+  .bar.light{background:#F3F4F6;color:#3A3F48;border:1px solid var(--line)}
+  .desk{border-radius:12px;height:190px;position:relative;overflow:hidden;
+        background:linear-gradient(135deg,#1E2A4A,#0E1424)}
+  .desk .tile{position:absolute;left:26px;top:22px;text-align:center;color:#E6EAF2}
+  .desk .tile img{display:block;width:72px;height:72px;border-radius:14px;
+        box-shadow:0 8px 20px rgba(0,0,0,.5)}
+  .desk .tile small{font-size:11px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  .sw{border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:12px}
+  .sw i{display:block;height:64px}
+  .sw div{padding:8px 10px;background:#fff}
+  .sw b{display:block;font-size:12px}
+  .sw span{color:var(--sub);font-family:Consolas,monospace;font-size:11px}
+  .grid-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+  .grid-wrap img{width:300px;height:300px;border-radius:20px;flex:none}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+  th{color:var(--sub);font-weight:600}
+  code{background:#EEF0F7;border-radius:6px;padding:1px 7px;
+       font-family:Consolas,monospace;font-size:12px}
+  .files td:first-child{font-family:Consolas,monospace;color:var(--violet)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>OctoDesk — Windows 应用图标</h1>
+  <p class="lead">GitHub 猫 × 桌面电脑 × 代码仓库管理 · 深紫炭底 + 白色剪影 + 提交绿 · Windows 11 Fluent 圆角底板</p>
+
+  <h2>设计概念 · 一形三义</h2>
+  <div class="card hero">
+    <img class="big" src="png/icon-256.png" alt="OctoDesk icon">
+    <div class="concept">
+      <div><b>🐱 猫耳 + 尾巴</b><span>GitHub Octocat 的识别特征：双耳立于屏顶两角，尾巴自底座右后方卷出，剪影整体即"猫头"。</span></div>
+      <div><b>🖥️ 显示器 + 底座</b><span>粗白描边的屏幕、支架与底座，一眼读出"桌面端应用"，而非移动端或网页。</span></div>
+      <div><b>🌿 Git 分支图</b><span>屏幕内主干 + 两个提交点，一条分支线向右上分出，表达仓库管理与分支工作流。</span></div>
+    </div>
+  </div>
+
+  <h2>尺寸阶梯（≤32px 使用简化变体）</h2>
+  <div class="card ladder">
+    <figure><img src="png/icon-256.png" width="128" height="128"><figcaption>256<small> · 完整版</small></figcaption></figure>
+    <figure><img src="png/icon-128.png" width="64" height="64"><figcaption>128<small> · 完整版</small></figcaption></figure>
+    <figure><img src="png/icon-64.png" width="48" height="48"><figcaption>64<small> · 完整版</small></figcaption></figure>
+    <figure><img src="png/icon-48.png" width="36" height="36"><figcaption>48<small> · 完整版</small></figcaption></figure>
+    <figure><img class="px16" src="png/icon-32.png" width="32" height="32"><figcaption>32</figcaption><span class="tag">简化版</span></figure>
+    <figure><img class="px16" src="png/icon-24.png" width="24" height="24"><figcaption>24</figcaption><span class="tag">简化版</span></figure>
+    <figure><img class="px16" src="png/icon-16.png" width="16" height="16"><figcaption>16</figcaption><span class="tag">简化版</span></figure>
+  </div>
+  <p style="color:var(--sub);font-size:13px;margin-top:12px">16–32px 场景（任务栏、标题栏、资源管理器列表）切换为简化变体：加粗尾巴、放大提交点、去掉细分分支线，保证小尺寸不糊。</p>
+
+  <h2>场景适配</h2>
+  <div class="card ctx">
+    <div class="bar dark">
+      <img src="png/icon-24.png" width="24" height="24"><span>OctoDesk</span>
+      <div class="win"><span>＿＿ ▢ ✕</span></div>
+      <span style="margin-left:auto;font-size:12px;opacity:.7">深色任务栏 ✓ 白色剪影保证对比</span>
+    </div>
+    <div class="bar light">
+      <img src="png/icon-24.png" width="24" height="24"><span>OctoDesk</span>
+      <div class="win"><span>＿＿ ▢ ✕</span></div>
+      <span style="margin-left:auto;font-size:12px;opacity:.7">浅色任务栏 ✓ 深底板自带边界</span>
+    </div>
+    <div class="desk">
+      <div class="tile"><img src="png/icon-64.png" alt=""><small>OctoDesk</small></div>
+      <span style="position:absolute;right:18px;bottom:12px;font-size:12px;color:#8FA0C0">桌面磁贴 · 文件资源管理器</span>
+    </div>
+  </div>
+
+  <h2>色彩规范</h2>
+  <div class="card">
+    <div class="swatches">
+      <div class="sw"><i style="background:linear-gradient(135deg,#453370,#131020)"></i><div><b>底板 Deep Violet</b><span>#453370 → #131020</span></div></div>
+      <div class="sw"><i style="background:#8B5CF6"></i><div><b>光晕 Glow</b><span>#8B5CF6 / 34%</span></div></div>
+      <div class="sw"><i style="background:#EDF2F9"></i><div><b>剪影 Glyph</b><span>#FFFFFF → #CFDAEA</span></div></div>
+      <div class="sw"><i style="background:#100C1B"></i><div><b>屏幕 Screen</b><span>#0D0A16 → #171129</span></div></div>
+      <div class="sw"><i style="background:#3FD070"></i><div><b>提交绿 Commit</b><span>#5CE68A → #2FBF64</span></div></div>
+      <div class="sw"><i style="background:#86EFAC"></i><div><b>分支绿 Branch</b><span>#86EFAC</span></div></div>
+    </div>
+    <p style="font-size:13px;color:var(--sub);margin:16px 0 0">
+      对比度：剪影 vs 底板 ≈ 11.8 : 1，提交绿 vs 屏幕 ≈ 8.4 : 1，均满足 WCAG AA 图形 ≥ 3 : 1 的要求；整套配色在深/浅任务栏上均有清晰边界。</p>
+  </div>
+
+  <h2>几何规范</h2>
+  <div class="card grid-wrap">
+    <img src="svg/icon-master.svg" alt="">
+    <div style="flex:1;min-width:320px">
+      <table>
+        <tr><th>要素</th><th>数值（1024 画布）</th></tr>
+        <tr><td>底板圆角</td><td>rx 214 ≈ 尺寸的 21%（Fluent 风格）</td></tr>
+        <tr><td>屏幕主体</td><td>596 × 354，rx 48，居中略偏上</td></tr>
+        <tr><td>屏幕窗口留边</td><td>58（≈ 0.9px @16px，保证白框可辨）</td></tr>
+        <tr><td>猫耳</td><td>底宽 156，高 128，描边圆角 26</td></tr>
+        <tr><td>尾巴</td><td>描边 46，圆头，卷曲半径约 90</td></tr>
+        <tr><td>提交点</td><td>主干 r 27 × 2，分支 r 23 × 1</td></tr>
+        <tr><td>安全边距</td><td>图形距底板边缘 ≥ 40</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h2>交付文件</h2>
+  <div class="card files">
+    <table>
+      <tr><th>文件</th><th>说明</th></tr>
+      <tr><td>octodesk.ico</td><td>Windows 安装包 / 快捷方式用，内含 256/128/64/48/32/24/16 七档（≤32 为简化变体）</td></tr>
+      <tr><td>svg/icon-master.svg</td><td>矢量母版，≥48px 全场景使用，可无损缩放</td></tr>
+      <tr><td>svg/icon-small.svg</td><td>小尺寸简化变体源文件</td></tr>
+      <tr><td>png/icon-*.png</td><td>1024 / 512 / 256 / 128 / 64 / 48 / 32 / 24 / 16，RGBA 透明通道</td></tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

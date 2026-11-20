@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitNest 法律文档</title>
+<meta name="description" content="GitNest 隐私政策与最终用户许可协议。">
+<style>
+  :root {
+    --fg: #1f2328;
+    --muted: #59636e;
+    --line: #d1d9e0;
+    --link: #0969da;
+    --bg: #f6f8fa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 64px 16px;
+    background: var(--bg);
+    color: var(--fg);
+    font: 15px/1.75 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: .2px; }
+  .sub { margin: 0 0 36px; color: var(--muted); font-size: 14px; }
+  .cards { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+  a.card {
+    display: block;
+    padding: 22px 24px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+  }
+  a.card:hover {
+    border-color: var(--link);
+    box-shadow: 0 4px 14px rgba(31, 35, 40, .08);
+    transform: translateY(-1px);
+  }
+  .card h2 { margin: 0 0 6px; font-size: 17px; color: var(--link); }
+  .card p { margin: 0; color: var(--muted); font-size: 14px; }
+  footer { margin-top: 36px; color: var(--muted); font-size: 13px; }
+  @media (max-width: 560px) {
+    body { padding: 40px 14px; }
+    .cards { grid-template-columns: 1fr; }
+    h1 { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>GitNest 法律文档</h1>
+  <p class="sub">开发者/运营方：Uaison（王淮森） ｜ 联系：<a href="mailto:752546024@qq.com">752546024@qq.com</a></p>
+
+  <div class="cards">
+    <a class="card" href="./privacy.html">
+      <h2>隐私政策</h2>
+      <p>说明本应用如何收集、使用、存储和保护信息。</p>
+    </a>
+    <a class="card" href="./eula.html">
+      <h2>最终用户许可协议</h2>
+      <p>安装与使用本软件所适用的许可条款。</p>
+    </a>
+  </div>
+
+  <footer>生效日期：2026 年 11 月 20 日</footer>
+</div>
+</body>
+</html>

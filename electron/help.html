@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>使用指南 · GitNest</title>
+<style>
+  :root {
+    --bg: #ffffff; --bg-soft: #f6f8fa; --border: #d0d7de;
+    --text: #1f2328; --text-secondary: #59636e; --text-muted: #818b98;
+    --accent: #0969da; --accent-soft: #ddf4ff;
+    --code-bg: #f6f8fa; --warn-bg: #fff8c5; --warn-border: #d4a72c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --bg-soft: #161b22; --border: #30363d;
+      --text: #e6edf3; --text-secondary: #9198a1; --text-muted: #6e7681;
+      --accent: #4493f8; --accent-soft: #0c2d6b;
+      --code-bg: #161b22; --warn-bg: #3a2f00; --warn-border: #9e6a03;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 24px 64px;
+    background: var(--bg); color: var(--text);
+    font: 14px/1.75 -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 {
+    font-size: 19px; margin: 40px 0 12px; padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  h3 { font-size: 15px; margin: 22px 0 8px; }
+  p, li { color: var(--text-secondary); }
+  .tagline { color: var(--text-muted); margin: 0 0 24px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 5px; font-size: 12.5px; font-family: Consolas, Monaco, monospace;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 12px 14px; overflow: auto; font-size: 12.5px; line-height: 1.6;
+  }
+  pre code { border: none; background: none; padding: 0; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .toc {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px; margin: 20px 0 8px;
+  }
+  .toc a {
+    display: block; padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: 8px; background: var(--bg-soft); color: var(--text);
+    font-size: 13px;
+  }
+  .toc a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  th { background: var(--bg-soft); color: var(--text); font-weight: 600; }
+  td { color: var(--text-secondary); }
+  .note, .warn {
+    border-radius: 8px; padding: 12px 14px; margin: 12px 0; font-size: 13px;
+  }
+  .note { background: var(--accent-soft); border: 1px solid var(--border); }
+  .warn { background: var(--warn-bg); border: 1px solid var(--warn-border); }
+  .note b, .warn b { color: var(--text); }
+  .meta { font-size: 12.5px; color: var(--text-muted); margin: -6px 0 12px; }
+  .about-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
+  .about-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; background: var(--bg-soft); }
+  .about-card h4 { margin: 0 0 6px; font-size: 13px; color: var(--text); }
+  .about-card p { margin: 0; font-size: 12.5px; }
+  details.lic {
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg-soft); padding: 0 14px; margin: 12px 0;
+  }
+  details.lic summary {
+    cursor: pointer; padding: 12px 0; color: var(--text);
+    font-size: 13px; font-weight: 600;
+  }
+  details.lic[open] { padding-bottom: 14px; }
+  details.lic table { margin-top: 6px; background: var(--bg); }
+  .lic-name { font-family: Consolas, Monaco, monospace; font-size: 12px; color: var(--text); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>GitNest 使用指南</h1>
+  <p class="tagline">纯 GitHub API + 本地 Git 的桌面仓库管理工具 · 版本 1.0.0</p>
+
+  <div class="toc">
+    <a href="#intro">① 项目背景与目的</a>
+    <a href="#start">② 快速开始</a>
+    <a href="#auth">③ 三种登录方式</a>
+    <a href="#usage">④ 应用操作指南</a>
+    <a href="#faq">⑤ 常见问题</a>
+    <a href="#about">⑥ 关于我们</a>
+    <a href="#privacy">⑦ 隐私政策</a>
+    <a href="#eula">⑧ 用户许可</a>
+    <a href="#security">⑨ 安全说明</a>
+  </div>
+
+  <!-- ============ 背景与目的 ============ -->
+  <h2 id="intro">① 项目背景与目的</h2>
+
+  <h3>为什么做这个工具</h3>
+  <p>
+    很多内网 / 受限网络环境会出现这样的组合：<b>git 协议不通</b>（SSH 22、git:// 9418 被拦截），
+    但 <b>HTTPS 访问 api.github.com 是可行的</b>。这种情况下命令行 <code>git clone</code> / <code>git push</code>
+    会长时间卡住或直接失败，而官方 GitHub Desktop 依赖本地 git 二进制，同样无法完成操作。
+  </p>
+  <p>
+    GitNest 的目标是把这个"半通"的网络条件利用起来：凡是能走 API 的事情走 API，
+    凡是必须落地文件的事情走本地文件系统与可选的本地 Git，从而在受限网络中依然能完成
+    <b>浏览仓库、查看/编辑文件、提交、推送、拉取、分支管理</b>这一整套日常协作动作。
+  </p>
+
+  <h3>设计目标</h3>
+  <ul>
+    <li><b>网络容错</b>：核心浏览与远程提交走 GitHub REST API（443 端口），不依赖 git 协议端口。</li>
+    <li><b>真实本地 Git</b>：本地仓库的提交 / 推送 / 拉取 / 分支操作使用系统 <code>git</code>，行为与命令行一致，历史真实可查。</li>
+    <li><b>两条路并行</b>：远程仓库可直接在线编辑并生成提交；本地仓库则享受完整的 Git 工作流。</li>
+    <li><b>零后端</b>：全部能力在 Electron 主进程内完成，不依赖自建服务，凭据只保存在本机配置中。</li>
+    <li><b>可读可控</b>：提交前可查看差异、推送前列出待推送提交、拉取前选择合并或变基，不做静默破坏性操作。</li>
+  </ul>
+
+  <div class="note">
+    <b>定位：</b>面向受限网络下的开发者、以及希望用一个轻量客户端同时管理"在线仓库 + 本地仓库"的用户；
+    它不是 GitHub Desktop 的完整替代品，而是针对特定网络与工作流的补充工具。
+  </div>
+
+  <!-- ============ 快速开始 ============ -->
+  <h2 id="start">② 快速开始</h2>
+  <ol>
+    <li>打开应用，在登录页选择一种登录方式（推荐 <a href="#pat">Personal Access Token</a>，最快）。</li>
+    <li>登录后进入仓库列表，四个标签页：<b>远程仓库 / 本地仓库 / 星标仓库 / 热门仓库</b>。</li>
+    <li>点击任意仓库卡片进入详情；本地仓库会额外拥有「📝 本地改动」入口。</li>
+    <li>需要把线上仓库落到本地时，在远程仓库详情页点「⬇ 下载并初始化」。</li>
+  </ol>
+
+  <!-- ============ 三种登录方式 ============ -->
+  <h2 id="auth">③ 三种登录方式</h2>
+  <p>三种方式最终都是拿到一个具有 <code>repo</code> 权限的 GitHub Token，区别在于获取 token 的过程。</p>
+
+  <table>
+    <tr><th>方式</th><th>需要准备</th><th>适合场景</th><th>有效期</th></tr>
+    <tr><td>Personal Access Token</td><td>无（直接在网页生成）</td><td>个人使用、最快</td><td>自定义（可长期）</td></tr>
+    <tr><td>OAuth Device Flow</td><td>OAuth App 的 Client ID</td><td>不想手填 token，类 GitHub CLI 体验</td><td>由 OAuth App 决定</td></tr>
+    <tr><td>Web OAuth（本地回调）</td><td>OAuth App 的 Client ID + 回调地址</td><td>标准网页授权流程</td><td>由 OAuth App 决定</td></tr>
+  </table>
+
+  <!-- PAT -->
+  <h3 id="pat">方式一：Personal Access Token（推荐起步）</h3>
+  <ol>
+    <li>打开 <a href="https://github.com/settings/tokens?type=beta">Fine-grained tokens</a>（推荐）或
+      <a href="https://github.com/settings/tokens/new">Classic tokens</a>。</li>
+    <li><b>Fine-grained</b>：Token name 随意；Expiration 选期限；Resource owner 选个人账号；
+      Repository access 选 <b>All repositories</b>（或指定仓库）；
+      Permissions 中把 <b>Contents</b> 设为 <b>Read and write</b>（需要 Issues / PR 能力时再开对应项）。</li>
+    <li><b>Classic</b>：Note 随意，Expiration 自选，直接勾选 <b>repo</b> 整个大类。</li>
+    <li>点击 Generate token，复制生成的字符串（只显示一次）。</li>
+    <li>回到应用登录页，选择「Token 粘贴」，粘贴后点「🚀 登录并验证」。</li>
+  </ol>
+  <div class="warn">
+    <b>注意：</b>token 等同于账号密码，请勿提交到代码仓库或截图外发。若怀疑泄露，立即在 GitHub 设置中 Revoke。
+  </div>
+
+  <!-- Device Flow -->
+  <h3 id="device">方式二：OAuth Device Flow（设备码）</h3>
+  <p>这是 GitHub CLI 使用的授权方式：应用拿到设备码，你在浏览器输入验证码确认，应用轮询获得 token。<b>只需要 Client ID，不需要 Client Secret。</b></p>
+
+  <h3 style="font-size:14px">Step 1 · 注册 OAuth App</h3>
+  <ol>
+    <li>打开 <a href="https://github.com/settings/developers">Settings → Developer settings → OAuth Apps</a>，
+      点 <b>New OAuth App</b>（组织账号则进入 Organization settings → Developer settings）。</li>
+    <li>填写：
+      <ul>
+        <li><b>Application name</b>：随便填，例如 <code>GitNest Local</code></li>
+        <li><b>Homepage URL</b>：可填 <code>https://github.com</code></li>
+        <li><b>Authorization callback URL</b>：可填 <code>https://github.com</code>（设备码流程不使用回调）</li>
+      </ul>
+    </li>
+    <li>创建后进入应用详情页，勾选 <b>Enable Device Flow</b>（<b>关键步骤</b>，不勾选会返回
+      <code>device_flow_disabled</code>）。</li>
+    <li>复制页面上的 <b>Client ID</b>（形如 <code>Iv1.xxxxxxxxxxxxxxxx</code>）。</li>
+  </ol>
+
+  <h3 style="font-size:14px">Step 2 · 在应用内使用</h3>
+  <ol>
+    <li>登录页点右上角 <b>⚙️</b>，把 Client ID 粘贴进去并保存。</li>
+    <li>选择「设备码」标签，点开始登录。</li>
+    <li>按提示在浏览器打开 <a href="https://github.com/login/device">github.com/login/device</a>，输入应用显示的一次性验证码。</li>
+    <li>授权完成后应用会自动登录。</li>
+  </ol>
+
+  <div class="note">
+    <b>Scope 说明：</b>应用默认申请 <code>repo read:user</code>（创建 / 更新仓库需要 <code>repo</code> 写权限）。
+    如需操作组织私有资源，请确保组织未限制第三方 OAuth App。
+  </div>
+
+  <!-- Web OAuth -->
+  <h3 id="web">方式三：Web OAuth（本地回调）</h3>
+  <p>标准网页授权：浏览器跳转 GitHub 授权页 → 授权后回调到本机端口 → 换取 token。</p>
+
+  <h3 style="font-size:14px">Step 1 · 配置 OAuth App 回调地址</h3>
+  <ol>
+    <li>同上进入 <b>OAuth Apps → New OAuth App</b>。</li>
+    <li><b>Authorization callback URL</b> 必须精确填写：<code>http://127.0.0.1:8765/callback</code></li>
+    <li>创建后复制 <b>Client ID</b>；如需客户端密钥换取 token，可在同一页面生成 <b>Client Secret</b>。</li>
+  </ol>
+
+  <h3 style="font-size:14px">Step 2 · 在应用内使用</h3>
+  <ol>
+    <li>⚙️ 中填入 Client ID 并保存。</li>
+    <li>选择「网页授权」标签，点击开始，浏览器会打开授权页。</li>
+    <li>点 Authorize 后，应用监听的 <code>127.0.0.1:8765</code> 收到回调，自动完成登录。</li>
+  </ol>
+  <div class="warn">
+    <b>排查：</b>若提示端口占用，请关闭占用 8765 的程序；若提示"换 token 失败"，通常是回调地址未与 OAuth App 配置完全一致，
+    或该应用未允许此流程，此时建议改用「设备码」方式。
+  </div>
+
+  <!-- ============ 操作指南 ============ -->
+  <h2 id="usage">④ 应用操作指南</h2>
+
+  <h3>仓库列表</h3>
+  <ul>
+    <li><b>远程仓库</b>：账号下的全部仓库（按更新时间排序）。</li>
+    <li><b>本地仓库</b>：已导入 / 已下载的本地目录，卡片显示文件数、目录数、待提交改动数。</li>
+    <li><b>星标仓库</b>：你 Star 过的仓库。</li>
+    <li><b>热门仓库</b>：按 Star 排序的高星项目。</li>
+    <li><b>搜索</b>：弹窗输入关键字回车，结果以「返回列表」回到原标签。</li>
+    <li><b>刷新</b>：强制重新拉取当前标签数据；标签切换与返回列表使用本地缓存，不会重复请求。</li>
+    <li><b>新建 / 管理</b>：新建仓库（可同时 clone 到本地）；管理面板可打开目录、移除本地记录、删除远程仓库（需输入仓库名二次确认）。</li>
+  </ul>
+
+  <h3>远程仓库详情</h3>
+  <ul>
+    <li><b>文件</b>：树形浏览、代码预览（跟随主题）、单文件历史、在线编辑并提交。</li>
+    <li><b>提交 / 分支 / 标签 / 贡献者 / 活动</b>：按需加载，切换标签时请求。</li>
+    <li><b>⬇ 下载并初始化</b>：下载分支 zip → 解压 → 初始化 Git → 关联远程 → 加入本地仓库列表。</li>
+    <li><b>🔗 关联远程仓库</b>：把本地目录与某个 GitHub 仓库绑定（支持下拉选择或手输）。</li>
+  </ul>
+
+  <h3>本地仓库 · 本地改动</h3>
+  <ul>
+    <li><b>文件勾选暂存</b>：左侧按「已暂存 / 未暂存 / 未跟踪」分组，勾选框切换暂存状态。</li>
+    <li><b>差异查看</b>：点击文件在右侧显示逐行差异。</li>
+    <li><b>提交</b>：填写摘要与描述（可自动生成），提交前有确认弹窗。</li>
+    <li><b>推送</b>：弹窗列出待推送提交与分支映射，确认后执行 <code>git push</code>。</li>
+    <li><b>拉取 / 更新</b>：选择合并（merge）或变基（rebase），可记住选择；拉取前提示本地未提交改动风险。</li>
+    <li><b>分支</b>：切换、新建、删除；顶部显示领先 / 落后提交数。</li>
+  </ul>
+
+  <h3>推送与拉取的行为差异</h3>
+  <table>
+    <tr><th>入口</th><th>实际动作</th><th>是否产生 .git 历史</th></tr>
+    <tr><td>远程仓库 · 下载并初始化</td><td>下载 zip + 初始化 Git + 关联 origin</td><td>是（初始化后）</td></tr>
+    <tr><td>远程仓库 · 在线提交</td><td>GitHub Git Data API 合成提交</td><td>是（在远端）</td></tr>
+    <tr><td>本地仓库 · 推送</td><td>本地 <code>git push</code>（HTTPS 自动注入 token）</td><td>是</td></tr>
+    <tr><td>本地仓库 · 更新</td><td>本地 <code>git pull [--rebase]</code></td><td>是</td></tr>
+  </table>
+
+  <!-- ============ FAQ ============ -->
+  <h2 id="faq">⑤ 常见问题</h2>
+  <ul>
+    <li><b>推送报 401 / Authentication failed</b>：token 失效或权限不足，重新生成并勾选 <code>repo</code> 写权限；SSH 远程则检查本机密钥。</li>
+    <li><b>推送被拒绝（non-fast-forward）</b>：远端有新提交，先「更新（拉取）」再推送。</li>
+    <li><b>拉取冲突</b>：应用不会自动丢弃本地改动，请先提交或贮藏（stash）后再拉取。</li>
+    <li><b>列表时间是旧的</b>：列表使用缓存并在进入 / 切标签时加载；点「🔄 刷新」强制更新。若提交只存在于本地未推送，GitHub 侧不会变化。</li>
+    <li><b>设备码提示 device_flow_disabled</b>：OAuth App 未勾选 Enable Device Flow。</li>
+    <li><b>图标显示为默认 Electron 图标</b>：Windows 图标缓存未刷新，重启资源管理器即可。</li>
+  </ul>
+
+  <!-- ============ 关于 ============ -->
+  <h2 id="about">⑥ 关于我们</h2>
+  <p>
+    GitNest 是一个面向受限网络环境的 GitHub 桌面客户端实践项目。目标不是复刻所有 Git 客户端功能，
+    而是在"git 协议不可用、API 可用"的现实约束下，给出一条能真正完成日常协作的路径。
+    项目采用主进程 + 渲染进程分层：所有网络与文件操作集中在主进程，渲染层只负责交互与展示，
+    便于审计、替换与二次开发。
+  </p>
+
+  <div class="about-grid">
+    <div class="about-card">
+      <h4>技术栈</h4>
+      <p>Electron 30 · Vue 3（Composition API）· Vite 5 · 原生 CSS 主题变量 · GitHub REST API v3 · 本地 Git CLI</p>
+    </div>
+    <div class="about-card">
+      <h4>架构</h4>
+      <p>主进程承载 HTTP / 文件系统 / git 执行与 IPC；预加载层以 contextBridge 暴露最小接口；渲染层三个视图：登录、仓库列表、仓库详情。</p>
+    </div>
+    <div class="about-card">
+      <h4>数据与隐私</h4>
+      <p>Token 与配置仅保存在本机用户目录（Electron userData），Token 使用系统凭据（Windows DPAPI / macOS Keychain）加密后落盘，不上传任何第三方服务器；所有请求直连 api.github.com。</p>
+    </div>
+    <div class="about-card">
+      <h4>版本与许可</h4>
+      <p>当前版本 1.0.0，MIT License。支持 Windows x64（安装包 / 便携版 / 绿色目录三种形态）。</p>
+    </div>
+    <div class="about-card">
+      <h4>适用与不适用</h4>
+      <p>适用于浏览、读写文件、提交、分支与推送等常规协作；不提供子模块、LFS 大文件、复杂冲突合并编辑器等高级能力。</p>
+    </div>
+    <div class="about-card">
+      <h4>反馈</h4>
+      <p>问题与建议请通过项目仓库 Issue 反馈，附上操作路径、错误文案与版本号便于定位。</p>
+    </div>
+  </div>
+
+  <h3>第三方许可</h3>
+  <p>
+    GitNest 自身以 <b>MIT License</b> 发布。安装包内还包含下列第三方组件，其许可均允许再分发；
+    完整的 Chromium / Node.js 许可原文随安装目录中的 <code>LICENSES.chromium.html</code> 与
+    <code>LICENSE.electron.txt</code> 一并提供。
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:32%">组件</th><th style="width:14%">版本</th><th>许可</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="lic-name">Electron</td><td>30.5.1</td><td>MIT</td></tr>
+      <tr><td class="lic-name">Chromium</td><td>124</td><td>BSD-3-Clause 等（见 LICENSES.chromium.html）</td></tr>
+      <tr><td class="lic-name">Node.js</td><td>20.16.0</td><td>MIT</td></tr>
+    </tbody>
+  </table>
+
+  <details class="lic">
+    <summary>npm 依赖清单（共 51 个，均为 MIT / BSD / ISC 等宽松许可）</summary>
+    <table>
+      <thead>
+        <tr><th style="width:38%">包名</th><th style="width:14%">版本</th><th>许可</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="lic-name">@babel/helper-string-parser</td><td>7.29.14</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@babel/helper-validator-identifier</td><td>7.29.7</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@babel/parser</td><td>7.29.14</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@babel/types</td><td>7.29.14</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@jridgewell/sourcemap-codec</td><td>1.6.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/compiler-core</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/compiler-dom</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/compiler-sfc</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/compiler-ssr</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/reactivity</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/runtime-core</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/runtime-dom</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/server-renderer</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">@vue/shared</td><td>3.5.45</td><td>MIT</td></tr>
+        <tr><td class="lic-name">adm-zip</td><td>0.5.18</td><td>MIT</td></tr>
+        <tr><td class="lic-name">ajv</td><td>6.15.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">ajv-formats</td><td>2.1.1</td><td>MIT</td></tr>
+        <tr><td class="lic-name">atomically</td><td>1.7.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">conf</td><td>10.2.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">csstype</td><td>3.2.4</td><td>MIT</td></tr>
+        <tr><td class="lic-name">debounce-fn</td><td>4.0.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">dot-prop</td><td>6.0.1</td><td>MIT</td></tr>
+        <tr><td class="lic-name">electron-store</td><td>8.2.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">entities</td><td>7.0.1</td><td>BSD-2-Clause</td></tr>
+        <tr><td class="lic-name">env-paths</td><td>2.2.1</td><td>MIT</td></tr>
+        <tr><td class="lic-name">estree-walker</td><td>2.0.2</td><td>MIT</td></tr>
+        <tr><td class="lic-name">fast-deep-equal</td><td>3.1.3</td><td>MIT</td></tr>
+        <tr><td class="lic-name">fast-uri</td><td>3.1.9</td><td>BSD-3-Clause</td></tr>
+        <tr><td class="lic-name">find-up</td><td>3.0.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">highlight.js</td><td>11.12.0</td><td>BSD-3-Clause</td></tr>
+        <tr><td class="lic-name">is-obj</td><td>2.0.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">json-schema-traverse</td><td>0.4.1</td><td>MIT</td></tr>
+        <tr><td class="lic-name">json-schema-typed</td><td>7.0.3</td><td>BSD-2-Clause</td></tr>
+        <tr><td class="lic-name">locate-path</td><td>3.0.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">magic-string</td><td>0.30.21</td><td>MIT</td></tr>
+        <tr><td class="lic-name">marked</td><td>4.3.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">mimic-fn</td><td>3.1.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">nanoid</td><td>3.3.20</td><td>MIT</td></tr>
+        <tr><td class="lic-name">onetime</td><td>5.1.2</td><td>MIT</td></tr>
+        <tr><td class="lic-name">p-limit</td><td>2.3.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">p-locate</td><td>3.0.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">p-try</td><td>2.2.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">path-exists</td><td>3.0.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">picocolors</td><td>1.1.1</td><td>ISC</td></tr>
+        <tr><td class="lic-name">pkg-up</td><td>3.1.0</td><td>MIT</td></tr>
+        <tr><td class="lic-name">postcss</td><td>8.5.33</td><td>MIT</td></tr>
+        <tr><td class="lic-name">require-from-string</td><td>2.0.2</td><td>MIT</td></tr>
+        <tr><td class="lic-name">semver</td><td>6.3.2</td><td>ISC</td></tr>
+        <tr><td class="lic-name">source-map-js</td><td>1.2.2</td><td>BSD-3-Clause</td></tr>
+        <tr><td class="lic-name">type-fest</td><td>2.19.0</td><td>MIT 或 CC0-1.0</td></tr>
+        <tr><td class="lic-name">vue</td><td>3.5.45</td><td>MIT</td></tr>
+      </tbody>
+    </table>
+    <p style="margin:10px 0 0;font-size:12px">
+      统计：MIT 43 个 · BSD-3-Clause 3 个 · BSD-2-Clause 2 个 · ISC 2 个 · MIT 或 CC0-1.0 1 个。
+      其中 <code>@vue/compiler-*</code>、<code>postcss</code>、<code>@babel/*</code> 等为构建期依赖，随包体存在但运行时不会加载。
+    </p>
+  </details>
+
+  <!-- ============ 隐私政策（完整版） ============ -->
+  <h2 id="privacy">⑦ 隐私政策</h2>
+  <p class="meta">生效日期：2026 年 11 月 20 日 ｜ 开发者/运营方：Uaison（王淮森） ｜ 联系方式：752546024@qq.com</p>
+  <p>本隐私政策说明 GitNest（以下简称「本应用」）在收集、使用、存储和保护用户信息方面的做法。
+    本应用为纯客户端桌面工具，<b>不依赖任何自建后端服务器</b>，因此数据处理范围极其有限。</p>
+
+  <h3>一、信息收集</h3>
+  <p>本应用<b>不主动收集、不上传任何用户数据</b>到开发者或任何第三方服务器。具体而言：</p>
+  <ul>
+    <li><b>个人账户信息：</b>不采集姓名、邮箱、手机号等个人身份信息。</li>
+    <li><b>使用行为数据：</b>无遥测（telemetry）、无用户行为分析、无崩溃上报。</li>
+    <li><b>设备信息：</b>不采集设备指纹、IP 地址、地理位置等信息。</li>
+  </ul>
+  <p>运行过程中产生的所有数据均保存在您本机的用户目录下，不会离开您的设备。</p>
+
+  <h3>二、GitHub Token 的处理</h3>
+  <p>本应用需要访问 GitHub 仓库，因此会获取一个 GitHub Personal Access Token（或通过 OAuth 流程获取的访问令牌，以下统称「Token」）：</p>
+  <ul>
+    <li><b>获取方式：</b>由您主动粘贴 Token，或通过 GitHub 官方 OAuth 流程（设备码 / 网页授权）获取，Token 由 GitHub 直接发放。</li>
+    <li><b>存储方式：</b>仅保存在本机用户目录的配置文件中，并使用操作系统级凭据加密（Windows DPAPI / macOS Keychain / Linux libsecret），加密后的存储前缀为 <code>enc:v1:</code>，<b>无法在其他设备或其他用户账户下解密</b>。</li>
+    <li><b>使用方式：</b>仅用于调用 GitHub REST API（<code>api.github.com</code>）及本地 Git 操作的远程鉴权（推送 / 拉取时注入到远程 URL，使用后即丢弃，不写入磁盘明文）。</li>
+    <li><b>共享情况：</b>Token 绝不会被发送给开发者或任何第三方，仅直连 GitHub 官方服务。</li>
+    <li><b>删除方式：</b>在应用内退出登录即清除本地 Token；或手动删除配置目录即可彻底清除；您也可随时在 GitHub 账户设置中吊销该 Token。</li>
+  </ul>
+
+  <h3>三、网络请求去向</h3>
+  <p>所有网络请求均直连 GitHub 官方域名：</p>
+  <ul>
+    <li><code>api.github.com</code> —— GitHub REST API</li>
+    <li><code>github.com</code> —— OAuth 授权与代码下载</li>
+  </ul>
+  <p>Web OAuth 的回调地址为本机回环地址 <code>http://127.0.0.1:8765/callback</code>，仅在授权期间临时监听，授权完成后立即关闭端口，不对外暴露。</p>
+
+  <h3>四、本地文件访问</h3>
+  <ul>
+    <li>当您选择「导入本地仓库」或「下载并初始化」时，本应用会读写您指定目录中的文件与 Git 元数据（<code>.git</code>）。</li>
+    <li>这些操作完全在本机进行，文件内容不会被上传。</li>
+    <li>本应用不会读取或访问您未明确指定的目录。</li>
+  </ul>
+
+  <h3>五、本地数据存储位置与清除</h3>
+  <table>
+    <tr><th>系统</th><th>配置目录</th></tr>
+    <tr><td>Windows</td><td><code>%APPDATA%\gitnest\</code></td></tr>
+    <tr><td>macOS</td><td><code>~/Library/Application Support/gitnest/</code></td></tr>
+    <tr><td>Linux</td><td><code>~/.config/gitnest/</code></td></tr>
+  </table>
+  <p><b>卸载本应用不会自动删除这些配置。</b>如需彻底清除，请手动删除上述目录。</p>
+
+  <h3>六、未成年人保护</h3>
+  <p>本应用面向开发者群体，不专门面向未成年人。若您是未成年人，请在监护人指导下使用。</p>
+
+  <h3>七、政策更新</h3>
+  <p>本政策可能随功能变更而更新，更新后将在应用内（帮助 → 隐私政策）同步发布，重大变更将通过显著方式告知。</p>
+
+  <h3>八、联系我们</h3>
+  <p>邮箱：752546024@qq.com ｜ 在线版本：<a href="https://uaison.top/gitnest/privacy.html" target="_blank" rel="noreferrer">https://uaison.top/gitnest/privacy.html</a></p>
+
+  <!-- ============ 用户许可协议（完整版） ============ -->
+  <h2 id="eula">⑧ 用户许可协议（EULA）</h2>
+  <p class="meta">生效日期：2026 年 11 月 20 日 ｜ 许可方：Uaison（王淮森）</p>
+  <p>感谢您使用 GitNest（以下简称「本软件」）。在安装或使用本软件前，请仔细阅读本协议。
+    一旦您安装、复制或以其他方式使用本软件，即视为您已同意受本协议条款约束。
+    如不同意，请勿安装或使用，并请删除本软件的全部副本。</p>
+
+  <h3>一、许可授予</h3>
+  <ul>
+    <li>本软件依据 <b>MIT License</b> 发布，许可方授予您一项全球性、非独占、不可转让、可撤销的许可，允许您在自有设备上安装、运行、复制、修改和再分发本软件。</li>
+    <li>再分发时须保留原始版权声明与本许可协议全文。</li>
+    <li>您不得将本软件用于任何违法目的，或违反 GitHub 等第三方服务条款的用途。</li>
+  </ul>
+
+  <h3>二、知识产权</h3>
+  <ul>
+    <li>本软件的著作权归许可方所有。</li>
+    <li>本软件包含第三方开源组件（Electron、Chromium、Node.js 及若干 npm 依赖），其知识产权归各自权利人所有，相关许可见 ⑥ 关于我们 → 第三方许可，及安装目录中的 <code>LICENSES.chromium.html</code>、<code>LICENSE.electron.txt</code>。</li>
+  </ul>
+
+  <h3>三、按现状提供与免责</h3>
+  <ul>
+    <li>本软件按「现状」（AS IS）提供，许可方不作出任何明示或默示的担保，包括但不限于对适销性、特定用途适用性、不侵权的默示担保。</li>
+    <li>在适用法律允许的最大范围内，许可方不对因使用或无法使用本软件而造成的任何直接、间接、附带、特殊或后果性损害（包括但不限于数据丢失、利润损失、业务中断）承担责任，即使已被告知该等损害的可能性。</li>
+    <li>您理解并同意：本软件会读写您指定的本地 Git 仓库文件。请在操作前自行做好备份，许可方不对因误操作导致的文件变更或丢失负责。</li>
+  </ul>
+
+  <h3>四、第三方服务</h3>
+  <ul>
+    <li>本软件依赖 GitHub 提供的 API 与 OAuth 服务。您使用相关功能时，同时受 GitHub 服务条款与隐私声明约束。</li>
+    <li>您的 GitHub 账户及 Token 的安全性由您自行负责。建议使用最小权限的 Fine-grained Token 并定期轮换。</li>
+  </ul>
+
+  <h3>五、数据与隐私</h3>
+  <ul>
+    <li>本软件不收集、不上传任何用户数据，不依赖自建后端。</li>
+    <li>您的 GitHub Token 使用操作系统级加密存储于本机，详见 ⑦ 隐私政策。</li>
+    <li>许可方不会访问您的 Token 或仓库内容。</li>
+  </ul>
+
+  <h3>六、更新与终止</h3>
+  <ul>
+    <li>许可方可自行决定随时发布本软件的更新版本，更新可能包含功能变更、缺陷修复或安全增强。</li>
+    <li>您可随时停止使用并删除本软件，本协议随即终止，但终止前已发生的权利义务不受影响。</li>
+  </ul>
+
+  <h3>七、适用法律与争议解决</h3>
+  <ul>
+    <li>本协议适用中华人民共和国法律。</li>
+    <li>因本协议产生的争议，双方应友好协商解决；协商不成的，提交许可方所在地有管辖权的人民法院处理。</li>
+  </ul>
+
+  <h3>八、协议变更</h3>
+  <p>许可方保留随时修改本协议的权利。修改后的协议将在应用内及本文件发布，继续使用本软件即视为您接受修改后的协议。</p>
+
+  <h3>九、联系方式</h3>
+  <p>邮箱：752546024@qq.com ｜ 在线版本：<a href="https://uaison.top/gitnest/eula.html" target="_blank" rel="noreferrer">https://uaison.top/gitnest/eula.html</a></p>
+  <div class="note">本协议与 MIT License 并行适用；如本协议条款与 MIT License 冲突，以 MIT License 为准。</div>
+
+  <!-- ============ 安全说明 ============ -->
+  <h2 id="security">⑨ 安全说明</h2>
+  <ul>
+    <li><b>Token 加密：</b>存储与读取均经过系统凭据加解密；从旧版本升级时，明文 Token 会在启动后自动补加密。</li>
+    <li><b>传输注入：</b>推送 / 拉取时将 Token 注入远程 URL 后即时使用，不向磁盘写入明文。</li>
+    <li><b>Electron Fuses：</b>已禁用 <code>ELECTRON_RUN_AS_NODE</code>、<code>NODE_OPTIONS</code>、<code>--inspect</code>
+      调试入口，并强制只从 <code>app.asar</code> 加载应用代码，防止调试器附加与注入。</li>
+    <li><b>渲染层混淆：</b>生产包对渲染层 JS 做标识符重命名、字符串数组抽取与控制流平坦化，提高静态反编译门槛。</li>
+    <li><b>OAuth 回调：</b>仅监听 <code>127.0.0.1:8765</code>，不绑定公网地址，授权完成立即释放端口。</li>
+    <li><b>建议：</b>优先使用 Fine-grained Personal Access Token 并授予最小必要权限，定期轮换；不要在多设备间复制配置文件。</li>
+  </ul>
+
+  <footer>
+    GitNest 1.0.0 · 纯 GitHub API + 本地 Git 的桌面仓库管理工具 · MIT License
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#453370"/>
+      <stop offset="0.45" stop-color="#2A1F45"/>
+      <stop offset="1" stop-color="#131020"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.36" cy="0.28" r="0.72">
+      <stop offset="0" stop-color="#8B5CF6" stop-opacity="0.34"/>
+      <stop offset="0.55" stop-color="#6D4BD8" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#6D4BD8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glyph" x1="0.2" y1="0" x2="0.5" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#EDF2F9"/>
+      <stop offset="1" stop-color="#CFDAEA"/>
+    </linearGradient>
+    <linearGradient id="win" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#0D0A16"/>
+      <stop offset="1" stop-color="#171129"/>
+    </linearGradient>
+    <linearGradient id="grn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5CE68A"/>
+      <stop offset="1" stop-color="#2FBF64"/>
+    </linearGradient>
+    <filter id="seat" x="-30%" y="-30%" width="160%" height="200%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#07040E" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- ============ 底板 ============ -->
+  <rect x="36" y="36" width="952" height="952" rx="214" fill="url(#tile)"/>
+  <rect x="36" y="36" width="952" height="952" rx="214" fill="url(#glow)"/>
+  <rect x="38" y="38" width="948" height="948" rx="212" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="4"/>
+
+  <!-- ============ 猫尾（在底板之上、显示器之下） ============ -->
+  <path d="M576 720 C 780 744, 946 702, 944 596 C 942 516, 886 476, 858 506"
+        fill="none" stroke="url(#glyph)" stroke-width="46" stroke-linecap="round"/>
+
+  <!-- ============ 显示器（猫头轮廓） ============ -->
+  <g filter="url(#seat)">
+    <!-- 底座 -->
+    <rect x="382" y="688" width="260" height="46" rx="23" fill="url(#glyph)"/>
+    <!-- 支架 -->
+    <path d="M470 586 H554 L574 692 H450 Z" fill="url(#glyph)"/>
+    <!-- 屏幕 -->
+    <rect x="214" y="246" width="596" height="354" rx="48" fill="url(#glyph)"/>
+    <!-- 猫耳 -->
+    <path d="M258 268 L296 128 L414 252 Z" fill="url(#glyph)" stroke="url(#glyph)" stroke-width="26" stroke-linejoin="round"/>
+    <path d="M766 268 L728 128 L610 252 Z" fill="url(#glyph)" stroke="url(#glyph)" stroke-width="26" stroke-linejoin="round"/>
+    <!-- 屏幕窗口 -->
+    <rect x="272" y="304" width="480" height="238" rx="26" fill="url(#win)"/>
+    <rect x="274" y="306" width="476" height="234" rx="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="2"/>
+  </g>
+
+  <!-- ============ 窗口内：Git 分支图 ============ -->
+  <g stroke-linecap="round" fill="none">
+    <!-- 主干 -->
+    <path d="M372 344 V506" stroke="url(#grn)" stroke-width="21" opacity="0.55"/>
+    <!-- 分支线 -->
+    <path d="M372 414 C 428 414, 432 362, 510 362" stroke="url(#grn)" stroke-width="19" opacity="0.85"/>
+  </g>
+  <circle cx="372" cy="348" r="27" fill="url(#grn)"/>
+  <circle cx="372" cy="500" r="27" fill="url(#grn)"/>
+  <circle cx="534" cy="362" r="23" fill="#86EFAC"/>
+</svg>

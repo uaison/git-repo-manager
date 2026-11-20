@@ -8,9 +8,12 @@
 | 项 | 值 |
 |---|---|
 | 应用名称 | GitNest |
-| 包 Identity | GitNest.GitNest |
+| 包 Identity Name | uaison.GitNest |
+| 包 Identity Publisher | CN=8D2E8A55-A948-4001-94F4-D7FC476668EF |
+| Package Family Name (PFN) | uaison.GitNest_f8m7w7s4r8ytw |
+| Package SID | S-1-15-2-1297251991-1824868847-2301578359-1512367143-1867700970-4134317892-779548683 |
 | 账号类型 | 个人（个人主体，需政府证件 + 自拍实名认证） |
-| 发布者显示名 | Uaison |
+| 发布者显示名 | uaison |
 | appId | io.gitnest.app |
 | 类别 | Developer tools（开发者工具） |
 | 支持平台 | Windows 10 版本 17763.0+ / Windows 11，x64 |

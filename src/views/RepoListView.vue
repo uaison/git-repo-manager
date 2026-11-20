@@ -53,6 +53,11 @@
             <span class="owner">{{ repo.owner?.login || repo.full_name?.split('/')[0] }}</span>
             <span class="sep">/</span>
             <span class="repo-name">{{ repo.name }}</span>
+            <span
+              v-if="repo.private === true || repo.private === false"
+              class="vis-badge"
+              :class="repo.private ? 'is-private' : 'is-public'"
+            >{{ repo.private ? '私有' : '公开' }}</span>
           </div>
           <div class="repo-desc">{{ repo.description || '暂无描述' }}</div>
           <div class="repo-meta">
@@ -120,6 +125,34 @@
           <input v-model="createForm.isPrivate" type="checkbox" />
           <span>私有仓库</span>
         </label>
+        <label class="check-row">
+          <input v-model="createForm.autoInit" type="checkbox" />
+          <span>初始化 README.md</span>
+        </label>
+        <label>.gitignore 模板</label>
+        <select v-model="createForm.gitignore">
+          <option value="">不添加</option>
+          <option value="Node">Node.js</option>
+          <option value="Python">Python</option>
+          <option value="Java">Java</option>
+          <option value="Go">Go</option>
+          <option value="Rust">Rust</option>
+          <option value="C++">C++</option>
+          <option value="VisualStudio">Visual Studio</option>
+          <option value="macOS">macOS</option>
+          <option value="Linux">Linux</option>
+          <option value="Windows">Windows</option>
+        </select>
+        <label>开源许可证</label>
+        <select v-model="createForm.license">
+          <option value="">不添加</option>
+          <option value="mit">MIT</option>
+          <option value="apache-2.0">Apache License 2.0</option>
+          <option value="gpl-3.0">GNU GPL v3.0</option>
+          <option value="bsd-3-clause">BSD 3-Clause</option>
+          <option value="mpl-2.0">Mozilla Public License 2.0</option>
+          <option value="unlicense">The Unlicense（公共领域）</option>
+        </select>
         <label class="check-row">
           <input v-model="createForm.cloneLocal" type="checkbox" />
           <span>创建后克隆到本地</span>
@@ -402,12 +435,24 @@ const showDelete = ref(false)
 const deleteTarget = ref(null)
 const deleteInput = ref('')
 const deleting = ref(false)
-const createForm = reactive({ name: '', description: '', isPrivate: false, cloneLocal: true, dir: '' })
+const createForm = reactive({
+  name: '',
+  description: '',
+  isPrivate: false,
+  autoInit: false,
+  gitignore: '',
+  license: '',
+  cloneLocal: true,
+  dir: ''
+})
 
 function openCreate () {
   createForm.name = ''
   createForm.description = ''
   createForm.isPrivate = false
+  createForm.autoInit = false
+  createForm.gitignore = ''
+  createForm.license = ''
   createForm.cloneLocal = true
   createForm.dir = ''
   showCreate.value = true
@@ -446,7 +491,9 @@ async function submitCreate () {
       name,
       description: createForm.description.trim(),
       private: createForm.isPrivate,
-      auto_init: true
+      auto_init: createForm.autoInit,
+      ...(createForm.gitignore ? { gitignore_template: createForm.gitignore } : {}),
+      ...(createForm.license ? { license_template: createForm.license } : {})
     })
     let tip = `仓库 ${repo.full_name} 创建成功。`
     if (createForm.cloneLocal && createForm.dir) {
@@ -603,6 +650,12 @@ watch(activeTab, (tab) => {
 .repo-header { font-size: 14px; }
 .owner, .sep { color: var(--text-muted); }
 .repo-name { font-weight: 600; color: var(--accent); }
+.vis-badge {
+  margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  white-space: nowrap; vertical-align: middle;
+}
+.vis-badge.is-public { background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); }
+.vis-badge.is-private { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text); }
 .repo-desc { color: var(--text-secondary); font-size: 13px; margin: 8px 0 10px; line-height: 1.5; min-height: 40px; }
 .repo-meta { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text-secondary); }
 .lang { display: flex; align-items: center; gap: 4px; }
@@ -644,6 +697,12 @@ watch(activeTab, (tab) => {
   background: var(--bg); color: var(--text); font-size: 13px; outline: none;
 }
 .modal input:not([type="checkbox"]):focus { border-color: var(--accent); }
+.modal select {
+  width: 100%; box-sizing: border-box; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text); font-size: 13px; outline: none;
+}
+.modal select:focus { border-color: var(--accent); }
 .check-row {
   display: flex !important; align-items: center; gap: 8px;
   margin: 12px 0 0 !important; font-weight: 400 !important; cursor: pointer;

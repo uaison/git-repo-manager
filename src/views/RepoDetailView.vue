@@ -7,6 +7,11 @@
         <span class="owner">{{ repo.owner?.login || repo.full_name?.split('/')[0] }}</span>
         <span class="sep">/</span>
         <strong class="name">{{ repo.name }}</strong>
+        <span
+          v-if="repo.private === true || repo.private === false"
+          class="vis-badge"
+          :class="repo.private ? 'is-private' : 'is-public'"
+        >{{ repo.private ? '私有' : '公开' }}</span>
         <a class="open-gh" @click="openOnGithub" title="在 GitHub 网页打开">🔗</a>
       </div>
 
@@ -3400,6 +3405,12 @@ onMounted(async () => {
 .repo-breadcrumb .owner { color: var(--text-muted); }
 .repo-breadcrumb .sep { color: var(--border-strong); }
 .repo-breadcrumb .name { color: var(--accent-hover); font-weight: 600; }
+.vis-badge {
+  padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 600;
+  white-space: nowrap; line-height: 1.6;
+}
+.vis-badge.is-public { background: var(--header-btn-bg); border: 1px solid var(--header-btn-border); color: var(--text-secondary); }
+.vis-badge.is-private { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text); }
 .open-gh { margin-left: 6px; cursor: pointer; font-size: 15px; opacity: .6; transition: opacity .15s; }
 .open-gh:hover { opacity: 1; }
 

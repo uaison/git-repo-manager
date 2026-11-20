@@ -1,6 +1,6 @@
 # GitNest
 
-> 纯 GitHub REST API + 本地 Git 的桌面仓库管理工具 · 版本 1.0.0 · MIT License
+> 纯 GitHub REST API + 本地 Git 的桌面仓库管理工具 · 版本 1.0.0 · Apache-2.0
 
 ## 📌 背景与目的
 
@@ -113,4 +113,4 @@ gitnest/
 
 ## 📝 License
 
-MIT
+Apache License 2.0（见 [LICENSE](LICENSE)，署名信息见 [NOTICE](NOTICE)）

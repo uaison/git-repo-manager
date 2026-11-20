@@ -15,7 +15,7 @@
 | 类别 | Developer tools（开发者工具） |
 | 支持平台 | Windows 10 版本 17763.0+ / Windows 11，x64 |
 | 支持语言 | 简体中文 (zh-CN)、English (en-US) |
-| 定价 | 免费（MIT 开源） |
+| 定价 | 免费（Apache-2.0 开源） |
 | 年龄分级 | IARC 问卷，预计 **Everyone / 3+**（无暴力、赌博、用户生成内容或社交分享） |
 
 ## 二、简短描述（short description，≤256 字符）
@@ -33,7 +33,7 @@ GitNest 是一款基于 Electron 的开源 GitHub 桌面客户端，将 GitHub R
 - 仓库管理：浏览、克隆、导入本地仓库，查看提交历史与分支。
 - 本地 Git：提交、推送、拉取、差异（diff）查看、Markdown 预览。
 - 安全与隐私：Token 使用操作系统级加密（Windows DPAPI / macOS Keychain / Linux libsecret）本地存储；无遥测、无崩溃上报、无自建后端，所有网络请求仅直连 GitHub 官方域名。
-- 开源免费：依据 MIT License 发布。
+- 开源免费：依据 Apache License 2.0 发布。
 
 **en-US**
 
@@ -43,7 +43,7 @@ GitNest is an open-source GitHub desktop client built with Electron, unifying th
 - Repo management: browse, clone, import local repositories, view commit history and branches.
 - Local Git: commit, push, pull, diff viewing and Markdown preview.
 - Security & privacy: tokens stored locally with OS-level encryption (DPAPI / Keychain / libsecret); no telemetry, no crash reporting, no backend — all requests go directly to GitHub.
-- Free and open source under the MIT License.
+- Free and open source under the Apache License 2.0.
 
 ## 四、功能要点（feature bullets，每条 ≤200 字符）
 
@@ -72,7 +72,7 @@ GitHub · Git · 版本控制 · 仓库管理 · desktop client · 开源 · 代
 - **隐私政策 URL**：`https://uaison.github.io/gitnest/privacy.html`（商店必填，需保持公开可匿名访问）
 - 用户许可协议 URL：`https://uaison.github.io/gitnest/eula.html`
 - 支持 / 联系邮箱：752546024@qq.com
-- 许可：MIT（见 `LICENSE`）
+- 许可：Apache License 2.0（见 `LICENSE` 与 `NOTICE`）
 - **代码签名证书**：走商店分发**无需自购**，认证通过后由微软免费重签。
 
 ## 八、提交前检查清单

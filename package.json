@@ -6,7 +6,7 @@
   "author": {
     "name": "Uaison"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "copyright": "Copyright (c) 2026 Uaison",
   "scripts": {
     "dev": "concurrently -k \"npm:dev:vite\" \"npm:dev:electron\"",
@@ -55,6 +55,7 @@
       "dist/**/*",
       "package.json",
       "LICENSE",
+      "NOTICE",
       "THIRD-PARTY-NOTICES.md"
     ],
     "win": {

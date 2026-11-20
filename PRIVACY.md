@@ -22,11 +22,10 @@
 本应用需要访问 GitHub 仓库，因此会获取一个 GitHub Personal Access Token（或通过 OAuth 流程获取的访问令牌，以下统称「Token」）：
 
 1. **获取方式**：由您主动粘贴 Token，或通过 GitHub 官方 OAuth 流程（设备码 / 网页授权）获取，Token 由 GitHub 直接发放。
-2. **存储方式**：Token 仅保存在本机用户目录的配置文件中，并使用操作系统级凭据加密：
+2. **存储方式**：Token 仅保存在本机用户目录的配置文件中，并使用操作系统级凭据加密（加密后的存储前缀为 `enc:v1:`，**无法在其他设备或其他用户账户下解密**）：
    - Windows：DPAPI（数据保护 API）
    - macOS：Keychain（钥匙串）
    - Linux：libsecret / 桌面环境密钥环
-   加密后的存储前缀为 `enc:v1:`，**无法在其他设备或其他用户账户下解密**。
 3. **使用方式**：Token 仅用于调用 GitHub REST API（`api.github.com`）以及本地 Git 操作的远程鉴权（推送 / 拉取时注入到远程 URL，使用后即丢弃，不写入磁盘明文）。
 4. **共享情况**：Token 绝不会被发送给开发者或任何第三方，仅直连 GitHub 官方服务。
 5. **删除方式**：在应用内退出登录即清除本地 Token；或手动删除配置目录（见下文）即可彻底清除。您也可随时在 GitHub 账户设置中吊销该 Token。

@@ -14,6 +14,7 @@
     "dev:electron": "wait-on tcp:5173 && cross-env NODE_ENV=development electron .",
     "build": "vite build",
     "build:obf": "cross-env OBFUSCATE=1 vite build",
+    "build:legal": "node scripts/build-legal-site.js",
     "build:win": "npm run build:obf && electron-builder --win",
     "build:portable": "npm run build:obf && electron-builder --win portable",
     "build:msix": "npm run build:obf && electron-builder --win appx",

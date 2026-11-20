@@ -1,0 +1,96 @@
+# 推送 v* 标签时自动构建、发布 Release，并部署隐私政策站点
+#
+# 需要的仓库 Secrets（Settings → Secrets and variables → Actions）：
+#   SSH_HOST          服务器地址
+#   SSH_USER          SSH 用户名
+#   SSH_PRIVATE_KEY   部署私钥（对应公钥已加入服务器 authorized_keys）
+#   SSH_PORT          SSH 端口（可选，默认 22）
+#   DEPLOY_PATH       站点目录（可选，默认 /var/www/uaison.top/gitnest/）
+#
+# 触发：git tag v1.0.0 && git push origin v1.0.0
+# 前置：package.json 的 version 必须与标签一致（去掉前缀 v）
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 校验标签与版本号一致
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}".TrimStart('v')
+          $ver = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ($tag -ne $ver) {
+            Write-Error "标签 $tag 与 package.json 版本 $ver 不一致，请先更新版本号"
+            exit 1
+          }
+          Write-Host "构建版本: $ver"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: 构建 Windows 安装包（NSIS + 免安装）
+        run: npm run build:win
+
+      - name: 构建商店 MSIX（未签名，提交商店后由微软重签）
+        run: npm run build:msix
+
+      - name: 创建 GitHub Release 并上传产物
+        uses: softprops/action-gh-release@v2
+        with:
+          name: GitNest ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            release/*.exe
+            release/*.msix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-legal:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_PORT: ${{ secrets.SSH_PORT || 22 }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/var/www/uaison.top/gitnest/' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 生成法律文档页面
+        run: node scripts/build-legal-site.js
+
+      - name: 配置 SSH
+        if: env.SSH_HOST != ''
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "${SSH_PORT:-22}" "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: 部署隐私政策 / 许可协议站点
+        if: env.SSH_HOST != ''
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_deploy -p ${SSH_PORT:-22}" \
+            deploy/gitnest/ "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}"
+
+      - name: 未配置部署凭据
+        if: env.SSH_HOST == ''
+        run: echo "::warning::未配置 SSH_HOST，已跳过隐私站点部署"

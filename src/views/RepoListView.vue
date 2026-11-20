@@ -251,6 +251,7 @@ const tabCache = repoListCache
 async function loadRepos (force = false) {
   const tab = activeTab.value
   if (!force && tabCache[tab]) {
+    loading.value = false
     repos.value = tabCache[tab]
     if (tab === 'local') await loadLocalStats()
     return
@@ -258,24 +259,29 @@ async function loadRepos (force = false) {
   loading.value = true
   error.value = ''
   try {
+    let list = []
+    let cfg = null
     if (tab === 'mine') {
-      repos.value = await getUserRepos(1)
+      list = await getUserRepos(1)
     } else if (tab === 'starred') {
-      repos.value = await getStarredRepos(1)
+      list = await getStarredRepos(1)
     } else if (tab === 'popular') {
-      repos.value = await getPopularRepos()
+      list = await getPopularRepos()
     } else if (tab === 'local') {
-      const cfg = await window.electronAPI.getConfig()
-      repos.value = cfg.repositories || []
-      await loadLocalStats(cfg)
+      cfg = await window.electronAPI.getConfig()
+      list = cfg.repositories || []
     }
-    tabCache[tab] = repos.value
+    tabCache[tab] = list
     tabCache.lastRefresh = Date.now()
     lastRefresh.value = tabCache.lastRefresh
+    // 切换后已离开该 tab：丢弃过期响应，避免覆盖当前 tab 的列表
+    if (tab !== activeTab.value) return
+    repos.value = list
+    if (tab === 'local') await loadLocalStats(cfg)
   } catch (e) {
-    error.value = formatErr(e)
+    if (tab === activeTab.value) error.value = formatErr(e)
   } finally {
-    loading.value = false
+    if (tab === activeTab.value) loading.value = false
   }
 }
 

@@ -109,40 +109,47 @@
   <p>本隐私政策说明 GitNest（以下简称「本应用」）在收集、使用、存储和保护用户信息方面的做法。请仔细阅读。本应用为纯客户端桌面工具，<strong>不依赖任何自建后端服务器</strong>，因此数据处理范围极其有限。</p>
 
   <h2>一、信息收集</h2>
+
   <p>本应用<strong>不主动收集、不上传任何用户数据</strong>到开发者或任何第三方服务器。具体而言：</p>
+
   <ol>
     <li><strong>个人账户信息</strong>：本应用不会采集您的姓名、邮箱、手机号等个人身份信息。</li>
     <li><strong>使用行为数据</strong>：本应用无遥测（telemetry）、无用户行为分析、无崩溃上报。</li>
     <li><strong>设备信息</strong>：本应用不采集设备指纹、IP 地址、地理位置等信息。</li>
   </ol>
+
   <p>本应用运行过程中产生的所有数据均保存在您本机的用户目录下，不会离开您的设备。</p>
 
   <h2>二、GitHub Token 的处理</h2>
+
   <p>本应用需要访问 GitHub 仓库，因此会获取一个 GitHub Personal Access Token（或通过 OAuth 流程获取的访问令牌，以下统称「Token」）：</p>
+
   <ol>
     <li><strong>获取方式</strong>：由您主动粘贴 Token，或通过 GitHub 官方 OAuth 流程（设备码 / 网页授权）获取，Token 由 GitHub 直接发放。</li>
-    <li><strong>存储方式</strong>：Token 仅保存在本机用户目录的配置文件中，并使用操作系统级凭据加密：
+    <li><strong>存储方式</strong>：Token 仅保存在本机用户目录的配置文件中，并使用操作系统级凭据加密（加密后的存储前缀为 <code>enc:v1:</code>，<strong>无法在其他设备或其他用户账户下解密</strong>）：
       <ul>
-        <li>Windows：DPAPI（数据保护 API）</li>
-        <li>macOS：Keychain（钥匙串）</li>
-        <li>Linux：libsecret / 桌面环境密钥环</li>
-      </ul>
-      加密后的存储前缀为 <code>enc:v1:</code>，<strong>无法在其他设备或其他用户账户下解密</strong>。
-    </li>
+    <li>Windows：DPAPI（数据保护 API）</li>
+    <li>macOS：Keychain（钥匙串）</li>
+    <li>Linux：libsecret / 桌面环境密钥环</li>
+  </ul></li>
     <li><strong>使用方式</strong>：Token 仅用于调用 GitHub REST API（<code>api.github.com</code>）以及本地 Git 操作的远程鉴权（推送 / 拉取时注入到远程 URL，使用后即丢弃，不写入磁盘明文）。</li>
     <li><strong>共享情况</strong>：Token 绝不会被发送给开发者或任何第三方，仅直连 GitHub 官方服务。</li>
     <li><strong>删除方式</strong>：在应用内退出登录即清除本地 Token；或手动删除配置目录（见下文）即可彻底清除。您也可随时在 GitHub 账户设置中吊销该 Token。</li>
   </ol>
 
   <h2>三、网络请求去向</h2>
+
   <p>本应用发起的所有网络请求均直连 GitHub 官方域名：</p>
+
   <ul>
     <li><code>api.github.com</code> —— GitHub REST API</li>
     <li><code>github.com</code> —— OAuth 授权与代码下载</li>
   </ul>
+
   <p>其中 Web OAuth 的回调地址为本机回环地址 <code>http://127.0.0.1:8765/callback</code>，仅在授权期间临时监听，授权完成后立即关闭端口，不对外暴露。</p>
 
   <h2>四、本地文件访问</h2>
+
   <ul>
     <li>当您选择「导入本地仓库」或「下载并初始化」时，本应用会读写您指定目录中的文件与 Git 元数据（<code>.git</code>）。</li>
     <li>这些操作完全在本机进行，文件内容不会被上传。</li>
@@ -150,28 +157,35 @@
   </ul>
 
   <h2>五、本地数据存储位置与清除</h2>
+
   <p>配置文件（含加密后的 Token、仓库列表、偏好设置）保存在：</p>
+
   <ul>
     <li>Windows：<code>%APPDATA%\gitnest\</code></li>
     <li>macOS：<code>~/Library/Application Support/gitnest/</code></li>
     <li>Linux：<code>~/.config/gitnest/</code></li>
   </ul>
+
   <p><strong>卸载本应用不会自动删除这些配置</strong>。如需彻底清除，请手动删除上述目录。</p>
 
   <h2>六、未成年人保护</h2>
+
   <p>本应用面向开发者群体，不专门面向未成年人。若您是未成年人，请在监护人指导下使用。</p>
 
   <h2>七、政策更新</h2>
+
   <p>本政策可能随功能变更而更新，更新后将在应用内（帮助 → 隐私政策）及本文件同步发布，重大变更将通过显著方式告知。</p>
 
   <h2>八、联系我们</h2>
+
   <p>如对本隐私政策有任何疑问、意见或建议，请通过以下方式联系：</p>
+
   <ul>
     <li>邮箱：<a href="mailto:752546024@qq.com">752546024@qq.com</a></li>
     <li>项目地址：（暂未发布公开仓库）</li>
   </ul>
 </main>
 
-<footer>GitNest ｜ 本页面为隐私政策的公开发布版本</footer>
+<footer>GitNest ｜ 本页面为 隐私政策 的公开发布版本</footer>
 </body>
 </html>

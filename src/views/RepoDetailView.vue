@@ -161,6 +161,7 @@
               <button v-if="activeTab === 'files'" class="gl-btn" @click="showFileFinder = true">🔍 查找文件</button>
               <button v-if="activeTab === 'files' || activeTab === 'overview'" class="gl-btn" @click="switchTab('commits')">🕘 历史</button>
               <button v-if="activeTab === 'tags' && canUseApi" class="gl-btn gl-btn-primary" @click="openCreateTag">＋ 新建标签</button>
+              <button v-if="activeTab === 'releases' && canUseApi" class="gl-btn gl-btn-primary" @click="openCreateRelease">＋ 新建发布</button>
             </div>
           </div>
 
@@ -669,6 +670,34 @@
             </div>
           </section>
 
+          <!-- ============ 发布（Releases） ============ -->
+          <section v-else-if="activeTab === 'releases'" class="gl-content">
+            <div v-if="releasesLoading" class="gl-loading"><span class="spinner"></span> 加载发布...</div>
+            <div v-else-if="!releases.length" class="gl-empty-card">暂无发布</div>
+            <div v-else class="gl-tag-list">
+              <div v-for="r in releases" :key="r.id" class="gl-tag-row">
+                <span class="gl-tag-ico">🚀</span>
+                <div class="gl-tag-main">
+                  <div class="gl-release-title">
+                    <span class="gl-tag-name">{{ r.name || r.tag_name }}</span>
+                    <span v-if="r.draft" class="gl-badge">草稿</span>
+                    <span v-else-if="r.prerelease" class="gl-badge warn">预发布</span>
+                  </div>
+                  <div class="gl-tag-sub">
+                    <span class="gl-tag-dot">🏷️</span>
+                    <span class="mono">{{ r.tag_name }}</span>
+                    <template v-if="r.published_at"> · {{ formatDate(r.published_at) }}发布</template>
+                  </div>
+                  <div v-if="releaseSummary(r.body)" class="gl-release-body">{{ releaseSummary(r.body) }}</div>
+                </div>
+                <div class="gl-tag-actions">
+                  <button class="gl-icon-act" title="在 GitHub 打开" @click="openReleasePage(r)">🔗</button>
+                  <button v-if="canUseApi" class="gl-icon-act danger" title="删除发布" @click="deleteRelease(r)">🗑</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <!-- ============ 贡献者 ============ -->
           <section v-else-if="activeTab === 'contributors'" class="gl-content">
             <div v-if="contributorsLoading" class="gl-loading"><span class="spinner"></span> 加载贡献者...</div>
@@ -1108,6 +1137,27 @@
           <button class="btn-secondary" @click="showCreateTag = false">取消</button>
           <button class="btn-primary" :disabled="!newTagName.trim() || creatingTag" @click="createTag">
             {{ creatingTag ? '创建中...' : '创建标签' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新建发布 -->
+    <div v-if="showCreateRelease" class="modal-mask" @click.self="showCreateRelease = false">
+      <div class="modal">
+        <h3>🚀 新建发布</h3>
+        <p class="modal-desc">基于标签创建 Release；若标签不存在，GitHub 会在默认分支的最新提交上自动创建。</p>
+        <label>标签名</label>
+        <input v-model="newReleaseTag" placeholder="例如 v1.0.0" />
+        <label>发布标题（可选）</label>
+        <input v-model="newReleaseName" placeholder="默认与标签名相同" />
+        <label>发布说明（可选，支持 Markdown）</label>
+        <textarea v-model="newReleaseBody" rows="6" placeholder="本次更新内容..."></textarea>
+        <label class="modal-check"><input type="checkbox" v-model="newReleasePre" /> 标记为预发布</label>
+        <div class="modal-actions">
+          <button class="btn-secondary" @click="showCreateRelease = false">取消</button>
+          <button class="btn-primary" :disabled="!newReleaseTag.trim() || creatingRelease" @click="createRelease">
+            {{ creatingRelease ? '发布中...' : '创建发布' }}
           </button>
         </div>
       </div>
@@ -1677,13 +1727,14 @@ const activity = ref([])
 const activityLoading = ref(false)
 
 function tabLabel (t) {
-  return { files: '📁 文件', branches: '🌿 分支', commits: '📜 提交', tags: '🏷️ 标签', activity: '⚡ 活动' }[t] || t
+  return { files: '📁 文件', branches: '🌿 分支', commits: '📜 提交', tags: '🏷️ 标签', releases: '🚀 发布', activity: '⚡ 活动' }[t] || t
 }
 
 watch(activeTab, async (t) => {
   if (t === 'branches') await loadBranches()
   else if (t === 'commits') await fetchCommits()
   else if (t === 'tags') await fetchTags()
+  else if (t === 'releases') await fetchReleases()
   else if (t === 'activity') await fetchActivity()
   else if (t === 'contributors') await fetchContributors()
   else if (t === 'files') loadDirFileCommits()
@@ -1703,6 +1754,14 @@ const showCreateTag = ref(false)
 const newTagName = ref('')
 const newTagRef = ref('')
 const creatingTag = ref(false)
+const releases = ref([])
+const releasesLoading = ref(false)
+const showCreateRelease = ref(false)
+const newReleaseTag = ref('')
+const newReleaseName = ref('')
+const newReleaseBody = ref('')
+const newReleasePre = ref(false)
+const creatingRelease = ref(false)
 const commitDetail = ref(null)
 const commitFiles = ref([])
 const commitFilesLoading = ref(false)
@@ -1723,11 +1782,11 @@ const hasLocalChanges = computed(() =>
   !!(stagedFiles.value.length || unstagedFiles.value.length || untrackedFiles.value.length)
 )
 const showToolbar = computed(() =>
-  ['files', 'commits', 'branches', 'tags', 'contributors'].includes(activeTab.value)
+  ['files', 'commits', 'branches', 'tags', 'releases', 'contributors'].includes(activeTab.value)
 )
 const currentDirPart = computed(() => currentDir.value)
 const pageTitle = computed(() => ({
-  files: '存储库', commits: '提交', branches: '分支', tags: '标签', contributors: '贡献者',
+  files: '存储库', commits: '提交', branches: '分支', tags: '标签', contributors: '贡献者', releases: '发布',
   network: '分支图', compare: '比较', graphs: '统计图', issues: '问题', merges: '合并请求',
   ci: 'CI/CD', wiki: '维基', snippets: '代码片段', settings: '设置', activity: '活动'
 }[activeTab.value] || ''))
@@ -1741,6 +1800,7 @@ const repoNavItems = computed(() => [
   { key: 'commits', icon: '🕘', label: '提交' },
   { key: 'branches', icon: '🌿', label: '分支' },
   { key: 'tags', icon: '🏷️', label: '标签' },
+  { key: 'releases', icon: '🚀', label: '发布' },
   { key: 'contributors', icon: '👥', label: '贡献者' }
 ])
 const otherNavItems = computed(() => [
@@ -2065,6 +2125,84 @@ async function deleteTag (t) {
   } catch (e) {
     alert('删除标签失败: ' + (e.message || JSON.stringify(e)))
   }
+}
+
+// ===== 发布（GitHub Releases）=====
+async function fetchReleases () {
+  if (!canUseApi.value) { releases.value = []; return }
+  releasesLoading.value = true
+  try {
+    const res = await window.electronAPI.apiRequest({
+      method: 'GET',
+      path: `/repos/${repoOwner()}/${props.repo.name}/releases?per_page=30`
+    })
+    releases.value = res || []
+  } catch (e) {
+    console.error('fetchReleases', e)
+    releases.value = []
+  } finally {
+    releasesLoading.value = false
+  }
+}
+
+function openCreateRelease () {
+  newReleaseTag.value = ''
+  newReleaseName.value = ''
+  newReleaseBody.value = ''
+  newReleasePre.value = false
+  showCreateRelease.value = true
+}
+
+async function createRelease () {
+  const tag = newReleaseTag.value.trim()
+  if (!tag || !canUseApi.value) return
+  creatingRelease.value = true
+  try {
+    const created = await window.electronAPI.apiRequest({
+      method: 'POST',
+      path: `/repos/${repoOwner()}/${props.repo.name}/releases`,
+      body: {
+        tag_name: tag,
+        name: newReleaseName.value.trim() || tag,
+        body: newReleaseBody.value,
+        draft: false,
+        prerelease: newReleasePre.value
+      }
+    })
+    releases.value = [created, ...releases.value]
+    showCreateRelease.value = false
+  } catch (e) {
+    alert('创建发布失败: ' + (e.message || JSON.stringify(e)))
+  } finally {
+    creatingRelease.value = false
+  }
+}
+
+async function deleteRelease (r) {
+  if (!window.confirm(`确认删除发布「${r.name || r.tag_name}」？标签本身不会被删除。`)) return
+  try {
+    await window.electronAPI.apiRequest({
+      method: 'DELETE',
+      path: `/repos/${repoOwner()}/${props.repo.name}/releases/${r.id}`
+    })
+    releases.value = releases.value.filter(x => x.id !== r.id)
+  } catch (e) {
+    alert('删除发布失败: ' + (e.message || JSON.stringify(e)))
+  }
+}
+
+function openReleasePage (r) {
+  const url = r.html_url || `https://github.com/${repoOwner()}/${props.repo.name}/releases/tag/${encodeURIComponent(r.tag_name)}`
+  window.electronAPI.openExternal(url)
+}
+
+function releaseSummary (body) {
+  const line = String(body || '')
+    .split('\n')
+    .map(s => s.trim())
+    .find(s => s && !s.startsWith('#'))
+  if (!line) return ''
+  return line.length > 120 ? line.slice(0, 120) + '…' : line
 }
 
 // ===== 提交分组 / 过滤 =====
@@ -2946,6 +3084,7 @@ async function refreshRemote () {
     const t = activeTab.value
     if (t === 'branches') await loadBranches()
     else if (t === 'tags') await fetchTags()
+    else if (t === 'releases') await fetchReleases()
     else if (t === 'activity') await fetchActivity()
     else if (t === 'contributors') await fetchContributors()
   } catch (e) {
@@ -3590,12 +3729,15 @@ onMounted(async () => {
 .modal h3 { color: var(--text); margin-bottom: 8px; font-size: 18px; }
 .modal-desc { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; line-height: 1.7; }
 .modal label { display: block; color: var(--text-secondary); font-size: 13px; font-weight: 500; margin: 12px 0 6px; }
-.modal input, .modal select {
+.modal input, .modal select, .modal textarea {
   width: 100%; padding: 10px 14px; border: 1px solid var(--border);
   background: var(--bg); color: var(--text-secondary); border-radius: 8px;
   font-size: 14px; outline: none; box-sizing: border-box;
 }
-.modal input:focus, .modal select:focus { border-color: var(--success); }
+.modal textarea { resize: vertical; font-family: inherit; line-height: 1.6; }
+.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--success); }
+.modal-check { display: flex; align-items: center; gap: 8px; font-weight: 400; }
+.modal-check input[type="checkbox"] { width: 16px; height: 16px; padding: 0; margin: 0; flex: 0 0 auto; accent-color: var(--accent); }
 .static-line {
   background: var(--bg-inset); color: var(--accent-hover); padding: 10px 14px;
   border-radius: 8px; font-family: Consolas, monospace; font-size: 13px;
@@ -4507,6 +4649,16 @@ onMounted(async () => {
 .gl-tag-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .gl-tag-dot { color: var(--text-muted); }
 .gl-tag-actions { display: flex; align-items: center; gap: 2px; }
+.gl-release-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gl-badge {
+  font-size: 11px; padding: 1px 7px; border-radius: 10px;
+  background: var(--bg); color: var(--text-muted); border: 1px solid var(--border);
+}
+.gl-badge.warn { background: rgba(212, 167, 44, 0.15); color: #d4a72c; border-color: rgba(212, 167, 44, 0.5); }
+.gl-release-body {
+  font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.6;
+  white-space: pre-wrap; max-height: 56px; overflow: hidden;
+}
 .gl-icon-act {
   width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
   background: transparent; border: none; border-radius: 4px; color: var(--text-muted);

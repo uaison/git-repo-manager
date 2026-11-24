@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 仓库操作
   selectDir: () => ipcRenderer.invoke('dialog:selectDir'),
   saveFile: (defaultPath) => ipcRenderer.invoke('dialog:saveFile', defaultPath),
+  downloadReleaseAsset: (args) => ipcRenderer.invoke('release:downloadAsset', args),
   repoPull: (args) => ipcRenderer.invoke('repo:pull', args),
 
   // 文件系统

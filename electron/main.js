@@ -883,6 +883,42 @@ function downloadBinary (token, fullUrl) {
   })
 }
 
+// 下载任意 URL 的二进制内容；跨域重定向时去掉 Authorization，
+// 避免把 GitHub 凭据发给对象存储导致签名校验失败。
+function fetchBinary (fullUrl, headers = {}, redirects = 0) {
+  return new Promise((resolve, reject) => {
+    if (redirects > 5) { reject(new Error('重定向次数过多')); return }
+    const url = new URL(fullUrl)
+    const req = https.request({
+      hostname: url.hostname,
+      port: url.port || 443,
+      path: url.pathname + url.search,
+      method: 'GET',
+      headers: { 'User-Agent': 'GitHub-Desktop-Electron', ...headers }
+    }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        res.resume()
+        const next = new URL(res.headers.location, url).toString()
+        const nextHeaders = { ...headers }
+        if (new URL(next).hostname !== url.hostname) delete nextHeaders.Authorization
+        fetchBinary(next, nextHeaders, redirects + 1).then(resolve).catch(reject)
+        return
+      }
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        const chunks = []
+        res.on('data', (chunk) => chunks.push(chunk))
+        res.on('end', () => resolve(Buffer.concat(chunks)))
+      } else {
+        let msg = ''
+        res.on('data', (chunk) => { msg += chunk })
+        res.on('end', () => reject(new Error(`HTTP ${res.statusCode} ${msg.slice(0, 200)}`)))
+      }
+    })
+    req.on('error', reject)
+    req.end()
+  })
+}
+
 // ============================================================
 // IPC: 配置管理
 // ============================================================
@@ -981,6 +1017,28 @@ ipcMain.handle('dialog:selectDir', async () => {
 ipcMain.handle('dialog:saveFile', async (_e, defaultPath) => {
   const result = await dialog.showSaveDialog(mainWindow, { defaultPath })
   return result.canceled ? null : result.filePath
+})
+
+// 下载发布附件：先让用户选择保存位置，再拉取二进制写入
+ipcMain.handle('release:downloadAsset', async (_e, { token, asset } = {}) => {
+  if (!asset || (!asset.url && !asset.browser_download_url)) {
+    return { success: false, message: '缺少附件信息' }
+  }
+  const result = await dialog.showSaveDialog(mainWindow, {
+    defaultPath: asset.name || 'download'
+  })
+  if (result.canceled || !result.filePath) return { success: false, canceled: true }
+  try {
+    const headers = { Accept: 'application/octet-stream' }
+    const realToken = token || getToken() || ''
+    if (realToken) headers.Authorization = `Bearer ${realToken}`
+    // asset.url 是 api.github.com 的资产端点，需要 Accept: application/octet-stream
+    const buffer = await fetchBinary(asset.url || asset.browser_download_url, headers)
+    fs.writeFileSync(result.filePath, buffer)
+    return { success: true, filePath: result.filePath }
+  } catch (err) {
+    return { success: false, message: err.message || JSON.stringify(err) }
+  }
 })
 
 // 拉取仓库：下载 zip 并解压到本地目录

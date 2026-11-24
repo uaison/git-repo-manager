@@ -722,7 +722,13 @@
             <div v-if="activityLoading" class="gl-loading"><span class="spinner"></span> 加载活动...</div>
             <div v-else-if="!activity.length" class="gl-empty-card">暂无活动记录</div>
             <div v-else class="gl-card gl-plain-card">
-              <div v-for="e in activity" :key="e.id" class="gl-activity-row clickable" @click="openActivityDetail(e)">
+              <div
+                v-for="e in activity"
+                :key="e.id"
+                class="gl-activity-row"
+                :class="{ clickable: canViewActivityDetail(e) }"
+                @click="canViewActivityDetail(e) && openActivityDetail(e)"
+              >
                 <span class="gl-activity-type">{{ eventIcon(e.type) }}</span>
                 <div class="gl-activity-main">
                   <div class="gl-activity-title">{{ eventTitle(e) }}</div>
@@ -1206,6 +1212,11 @@
             <div v-for="a in detailItem.data.assets" :key="a.id" class="detail-asset">
               <span class="detail-asset-name">{{ a.name }}</span>
               <span class="detail-asset-size">{{ releaseAssetSize(a.size) }} · {{ a.download_count }} 次下载</span>
+              <button
+                class="detail-asset-download"
+                :disabled="downloadingAsset === a.id"
+                @click="downloadReleaseAsset(a)"
+              >{{ downloadingAsset === a.id ? '下载中...' : '⬇ 下载' }}</button>
             </div>
           </div>
           <div class="modal-actions">
@@ -1241,6 +1252,19 @@
             <span v-if="detailItem.data.created_at">{{ formatDateTime(detailItem.data.created_at) }}</span>
             <span v-if="detailItem.data.payload?.ref">分支 <span class="mono">{{ detailItem.data.payload.ref }}</span></span>
           </div>
+          <div v-if="detailItem.data.payload?.pull_request" class="detail-meta">
+            <span>
+              PR #{{ detailItem.data.payload.pull_request.number }}
+              {{ detailItem.data.payload.pull_request.title }}
+            </span>
+            <span v-if="detailItem.data.payload.pull_request.merged" class="gl-badge">已合并</span>
+            <span v-if="detailItem.data.payload.pull_request.merged_at">
+              合并于 {{ formatDateTime(detailItem.data.payload.pull_request.merged_at) }}
+            </span>
+            <span v-if="detailItem.data.payload.pull_request.merge_commit_sha" class="mono">
+              合并提交 {{ detailItem.data.payload.pull_request.merge_commit_sha.slice(0, 8) }}
+            </span>
+          </div>
           <div v-if="activityCommits(detailItem.data).length" class="detail-assets">
             <div class="detail-section-title">提交（{{ activityCommits(detailItem.data).length }}）</div>
             <div v-for="c in activityCommits(detailItem.data)" :key="c.sha" class="detail-commit-row">
@@ -1249,7 +1273,7 @@
               <span v-if="c.author?.name" class="detail-commit-author">{{ c.author.name }}</span>
             </div>
           </div>
-          <p v-else class="modal-desc">该活动没有提交明细。</p>
+          <p v-else-if="!detailItem.data.payload?.pull_request" class="modal-desc">该活动没有提交明细。</p>
           <div class="modal-actions">
             <button class="btn-primary" @click="detailItem = null">关闭</button>
           </div>
@@ -2319,6 +2343,33 @@ function openTagOnGithub (t) {
 
 function activityCommits (e) {
   return Array.isArray(e?.payload?.commits) ? e.payload.commits : []
+}
+
+// 仅推送（含提交）与已合并的 PR 提供详情，其余活动不可点击
+function canViewActivityDetail (e) {
+  if (!e) return false
+  if (e.type === 'PushEvent') return activityCommits(e).length > 0 || pushCommitCount(e) > 0
+  if (e.type === 'PullRequestEvent') return e.payload?.pull_request?.merged === true
+  return false
+}
+
+const downloadingAsset = ref(null)
+async function downloadReleaseAsset (a) {
+  if (downloadingAsset.value !== null) return
+  downloadingAsset.value = a.id
+  try {
+    const res = await window.electronAPI.downloadReleaseAsset({ asset: a })
+    if (res?.canceled) return
+    if (!res?.success) {
+      alert('下载附件失败: ' + (res?.message || '未知错误'))
+      return
+    }
+    alert(`附件已保存到：${res.filePath}`)
+  } catch (e) {
+    alert('下载附件失败: ' + (e.message || e))
+  } finally {
+    downloadingAsset.value = null
+  }
 }
 
 const detailReleaseHtml = computed(() => {
@@ -4846,12 +4897,19 @@ onMounted(async () => {
 .detail-assets { margin-top: 16px; }
 .detail-section-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
 .detail-asset {
-  display: flex; justify-content: space-between; gap: 12px;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
   padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 12px;
 }
 .detail-asset:last-child { border-bottom: none; }
-.detail-asset-name { color: var(--text); word-break: break-all; }
+.detail-asset-name { flex: 1; color: var(--text); word-break: break-all; }
 .detail-asset-size { color: var(--text-muted); white-space: nowrap; }
+.detail-asset-download {
+  flex-shrink: 0; padding: 3px 10px; font-size: 12px; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg-elevated); color: var(--text);
+}
+.detail-asset-download:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.detail-asset-download:disabled { opacity: .6; cursor: default; }
 .detail-commit-row {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 12px;

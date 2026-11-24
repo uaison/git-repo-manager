@@ -19,7 +19,7 @@
       <div class="branch-group" v-if="!repo._isLocal">
         <span class="label">分支</span>
         <BranchDropdown v-model="selectedBranch" :branches="branchOptions" variant="header" @change="onBranchChange" />
-        <div class="branch-popover-wrap">
+        <div class="branch-popover-wrap" v-if="canManageBranches">
           <button class="btn-manage" @click="showBranchPanel = !showBranchPanel" title="管理分支">管理 ▾</button>
           <div v-if="showBranchPanel" class="branch-popover" @click.stop>
             <div class="popover-section">
@@ -165,8 +165,8 @@
               />
               <button v-if="activeTab === 'files'" class="gl-btn" @click="showFileFinder = true">🔍 查找文件</button>
               <button v-if="activeTab === 'files' || activeTab === 'overview'" class="gl-btn" @click="switchTab('commits')">🕘 历史</button>
-              <button v-if="activeTab === 'tags' && canUseApi" class="gl-btn gl-btn-primary" @click="openCreateTag">＋ 新建标签</button>
-              <button v-if="activeTab === 'releases' && canUseApi" class="gl-btn gl-btn-primary" @click="openCreateRelease">＋ 新建发布</button>
+              <button v-if="activeTab === 'tags' && canManageContent" class="gl-btn gl-btn-primary" @click="openCreateTag">＋ 新建标签</button>
+              <button v-if="activeTab === 'releases' && canManageContent" class="gl-btn gl-btn-primary" @click="openCreateRelease">＋ 新建发布</button>
             </div>
           </div>
 
@@ -639,7 +639,7 @@
                 <div class="gl-branch-actions">
                   <button class="gl-btn gl-btn-sm" :disabled="b.name === selectedBranch" @click="switchToBranch(b.name)">切换</button>
                   <button
-                    v-if="!isLocalRepo"
+                    v-if="!isLocalRepo && canManageRemote"
                     class="gl-btn gl-btn-sm danger"
                     :disabled="b.name === selectedBranch || branches.length <= 1"
                     @click="deleteBranchByName(b.name)"
@@ -648,7 +648,7 @@
               </div>
               <div v-if="isLocalRepo" class="gl-tip">
                 本地仓库分支列表取自远程 <code>origin</code>，可在这里切换查看。
-                <button class="gl-link" @click="showCreateBranch = true">➕ 新建远程分支</button>
+                <button class="gl-link" v-if="canManageRemote" @click="showCreateBranch = true">➕ 新建远程分支</button>
               </div>
             </div>
           </section>
@@ -658,7 +658,7 @@
             <div v-if="tagsLoading" class="gl-loading"><span class="spinner"></span> 加载标签...</div>
             <div v-else-if="!filteredTags.length" class="gl-empty-card">暂无标签</div>
             <div v-else class="gl-tag-list">
-              <div v-for="t in filteredTags" :key="t.name" class="gl-tag-row">
+              <div v-for="t in filteredTags" :key="t.name" class="gl-tag-row clickable" @click="openTagDetail(t)">
                 <span class="gl-tag-ico">🏷️</span>
                 <div class="gl-tag-main">
                   <div class="gl-tag-name">{{ t.name }}</div>
@@ -668,8 +668,8 @@
                   </div>
                 </div>
                 <div class="gl-tag-actions">
-                  <button class="gl-icon-act" title="复制 SHA" @click="copyText(t.commit?.sha)">⧉</button>
-                  <button v-if="canUseApi" class="gl-icon-act danger" title="删除标签" @click="deleteTag(t)">🗑</button>
+                  <button class="gl-icon-act" title="复制 SHA" @click.stop="copyText(t.commit?.sha)">⧉</button>
+                  <button v-if="canManageContent" class="gl-icon-act danger" title="删除标签" @click.stop="deleteTag(t)">🗑</button>
                 </div>
               </div>
             </div>
@@ -680,7 +680,7 @@
             <div v-if="releasesLoading" class="gl-loading"><span class="spinner"></span> 加载发布...</div>
             <div v-else-if="!releases.length" class="gl-empty-card">暂无发布</div>
             <div v-else class="gl-tag-list">
-              <div v-for="r in releases" :key="r.id" class="gl-tag-row">
+              <div v-for="r in releases" :key="r.id" class="gl-tag-row clickable" @click="openReleaseDetail(r)">
                 <span class="gl-tag-ico">🚀</span>
                 <div class="gl-tag-main">
                   <div class="gl-release-title">
@@ -696,8 +696,8 @@
                   <div v-if="releaseSummary(r.body)" class="gl-release-body">{{ releaseSummary(r.body) }}</div>
                 </div>
                 <div class="gl-tag-actions">
-                  <button class="gl-icon-act" title="在 GitHub 打开" @click="openReleasePage(r)">🔗</button>
-                  <button v-if="canUseApi" class="gl-icon-act danger" title="删除发布" @click="deleteRelease(r)">🗑</button>
+                  <button class="gl-icon-act" title="在 GitHub 打开" @click.stop="openReleasePage(r)">🔗</button>
+                  <button v-if="canManageContent" class="gl-icon-act danger" title="删除发布" @click.stop="deleteRelease(r)">🗑</button>
                 </div>
               </div>
             </div>
@@ -722,7 +722,7 @@
             <div v-if="activityLoading" class="gl-loading"><span class="spinner"></span> 加载活动...</div>
             <div v-else-if="!activity.length" class="gl-empty-card">暂无活动记录</div>
             <div v-else class="gl-card gl-plain-card">
-              <div v-for="e in activity" :key="e.id" class="gl-activity-row">
+              <div v-for="e in activity" :key="e.id" class="gl-activity-row clickable" @click="openActivityDetail(e)">
                 <span class="gl-activity-type">{{ eventIcon(e.type) }}</span>
                 <div class="gl-activity-main">
                   <div class="gl-activity-title">{{ eventTitle(e) }}</div>
@@ -1183,6 +1183,77 @@
             {{ merging ? '合并中...' : '开始合并' }}
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- 标签 / 发布 / 活动详情 -->
+    <div v-if="detailItem" class="modal-mask" @click.self="detailItem = null">
+      <div class="modal detail-modal">
+        <!-- 发布详情 -->
+        <template v-if="detailItem.kind === 'release'">
+          <h3>🚀 {{ detailItem.data.name || detailItem.data.tag_name }}</h3>
+          <div class="detail-meta">
+            <span>🏷️ <span class="mono">{{ detailItem.data.tag_name }}</span></span>
+            <span v-if="detailItem.data.draft" class="gl-badge">草稿</span>
+            <span v-else-if="detailItem.data.prerelease" class="gl-badge warn">预发布</span>
+            <span v-if="detailItem.data.published_at">发布于 {{ formatDateTime(detailItem.data.published_at) }}</span>
+            <span v-if="detailItem.data.author?.login">作者 {{ detailItem.data.author.login }}</span>
+          </div>
+          <div v-if="detailItem.data.body" class="markdown-body detail-markdown" v-html="detailReleaseHtml"></div>
+          <p v-else class="modal-desc">该发布没有填写说明。</p>
+          <div v-if="detailItem.data.assets?.length" class="detail-assets">
+            <div class="detail-section-title">附件（{{ detailItem.data.assets.length }}）</div>
+            <div v-for="a in detailItem.data.assets" :key="a.id" class="detail-asset">
+              <span class="detail-asset-name">{{ a.name }}</span>
+              <span class="detail-asset-size">{{ releaseAssetSize(a.size) }} · {{ a.download_count }} 次下载</span>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-secondary" @click="detailItem = null">关闭</button>
+            <button class="btn-primary" @click="openReleasePage(detailItem.data)">在 GitHub 打开</button>
+          </div>
+        </template>
+
+        <!-- 标签详情 -->
+        <template v-else-if="detailItem.kind === 'tag'">
+          <h3>🏷️ {{ detailItem.data.name }}</h3>
+          <div class="detail-meta">
+            <span>目标提交</span>
+            <span class="mono detail-break">{{ detailItem.data.commit?.sha || '—' }}</span>
+            <span v-if="detailItem.data.commit?.sha" class="gl-badge">短 SHA {{ detailItem.data.commit.sha.slice(0, 8) }}</span>
+          </div>
+          <div v-if="detailItem.data.commit?.url" class="detail-meta">
+            <span class="detail-break">{{ detailItem.data.commit.url }}</span>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-secondary" @click="detailItem = null">关闭</button>
+            <button class="btn-secondary" @click="copyText(detailItem.data.commit?.sha)">复制 SHA</button>
+            <button class="btn-primary" @click="openTagOnGithub(detailItem.data)">在 GitHub 打开</button>
+          </div>
+        </template>
+
+        <!-- 活动详情 -->
+        <template v-else>
+          <h3>{{ eventIcon(detailItem.data.type) }} {{ eventTitle(detailItem.data) }}</h3>
+          <div class="detail-meta">
+            <span>事件类型 <span class="mono">{{ detailItem.data.type }}</span></span>
+            <span v-if="detailItem.data.actor?.login">操作人 {{ detailItem.data.actor.login }}</span>
+            <span v-if="detailItem.data.created_at">{{ formatDateTime(detailItem.data.created_at) }}</span>
+            <span v-if="detailItem.data.payload?.ref">分支 <span class="mono">{{ detailItem.data.payload.ref }}</span></span>
+          </div>
+          <div v-if="activityCommits(detailItem.data).length" class="detail-assets">
+            <div class="detail-section-title">提交（{{ activityCommits(detailItem.data).length }}）</div>
+            <div v-for="c in activityCommits(detailItem.data)" :key="c.sha" class="detail-commit-row">
+              <span class="mono">{{ (c.sha || '').slice(0, 8) }}</span>
+              <span class="detail-commit-msg">{{ String(c.message || '').split('\n')[0] }}</span>
+              <span v-if="c.author?.name" class="detail-commit-author">{{ c.author.name }}</span>
+            </div>
+          </div>
+          <p v-else class="modal-desc">该活动没有提交明细。</p>
+          <div class="modal-actions">
+            <button class="btn-primary" @click="detailItem = null">关闭</button>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -1782,6 +1853,26 @@ const canUseApi = computed(() => {
   return true
 })
 const projectInitial = computed(() => String(props.repo.name || 'P').slice(0, 1).toUpperCase())
+
+// ========== 仓库管理权限 ==========
+// 仅对仓库有 push / maintain / admin 权限时才允许管理发布、标签与分支
+const repoPermissions = ref(null)
+const canManageRemote = computed(() => {
+  const p = repoPermissions.value || props.repo?.permissions
+  return !!(p && (p.admin || p.maintain || p.push))
+})
+// 标签 / 发布均为远程资源，需同时具备 API 可用性与权限
+const canManageContent = computed(() => canUseApi.value && canManageRemote.value)
+// 本地仓库的分支操作走本地 git，不受远程权限限制
+const canManageBranches = computed(() => isLocalRepo.value || canManageRemote.value)
+
+async function loadRepoPermissions () {
+  if (!canUseApi.value) return
+  try {
+    const data = await getRepo(repoOwner(), props.repo.name)
+    if (data?.permissions) repoPermissions.value = data.permissions
+  } catch { /* 探测失败时回退到列表数据中的 permissions */ }
+}
 const latestCommit = computed(() => commits.value[0] || null)
 const hasLocalChanges = computed(() =>
   !!(stagedFiles.value.length || unstagedFiles.value.length || untrackedFiles.value.length)
@@ -2210,6 +2301,44 @@ function releaseSummary (body) {
   return line.length > 120 ? line.slice(0, 120) + '…' : line
 }
 
+// ===== 列表详情 =====
+const detailItem = ref(null)   // { kind: 'release' | 'tag' | 'activity', data }
+function openReleaseDetail (r) { detailItem.value = { kind: 'release', data: r } }
+function openTagDetail (t) { detailItem.value = { kind: 'tag', data: t } }
+function openActivityDetail (e) { detailItem.value = { kind: 'activity', data: e } }
+
+function tagCommitUrl (t) {
+  const sha = t?.commit?.sha
+  return sha ? `https://github.com/${repoOwner()}/${props.repo.name}/commit/${sha}` : ''
+}
+
+function openTagOnGithub (t) {
+  const url = tagCommitUrl(t) || `https://github.com/${repoOwner()}/${props.repo.name}/tags`
+  window.electronAPI.openExternal(url)
+}
+
+function activityCommits (e) {
+  return Array.isArray(e?.payload?.commits) ? e.payload.commits : []
+}
+
+const detailReleaseHtml = computed(() => {
+  if (detailItem.value?.kind !== 'release') return ''
+  return marked.parse(detailItem.value.data.body || '')
+})
+
+function formatDateTime (iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleString('zh-CN')
+}
+
+function releaseAssetSize (size) {
+  const n = Number(size) || 0
+  if (n < 1024) return `${n} B`
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+  return `${(n / 1024 / 1024).toFixed(1)} MB`
+}
+
 // ===== 提交分组 / 过滤 =====
 const filteredCommits = computed(() => {
   const q = commitFilter.value.trim().toLowerCase()
@@ -2517,7 +2646,8 @@ async function fetchActivity () {
       const res = await window.electronAPI.apiRequest({
         method: 'GET', path: `/repos/${owner}/${props.repo.name}/events?per_page=30`
       })
-      activity.value = res || []
+      // 过滤掉分支删除等场景产生的 0 提交推送记录
+      activity.value = (res || []).filter(e => e.type !== 'PushEvent' || pushCommitCount(e) > 0)
     }
   } catch (e) { console.error('fetchActivity', e); activity.value = [] }
   activityLoading.value = false
@@ -2551,6 +2681,12 @@ function openCommitOnGithub (c) {
 
 function openLink (url) { window.electronAPI.openExternal(url).catch(() => {}) }
 
+function pushCommitCount (e) {
+  const pl = e?.payload || {}
+  return typeof pl.size === 'number'
+    ? pl.size
+    : (Array.isArray(pl.commits) ? pl.commits.length : 0)
+}
 function eventIcon (t) {
   return { PushEvent: '📨', CreateEvent: '✨', DeleteEvent: '🗑️', PullRequestEvent: '🔀', IssuesEvent: '🐛', WatchEvent: '⭐', ForkEvent: '🍴' }[t] || '⚡'
 }
@@ -2559,10 +2695,7 @@ function eventTitle (e) {
   const pl = e.payload || {}
   if (e.type === 'PushEvent') {
     // payload.size 是 GitHub PushEvent 规范字段，表示真实推送的提交总数
-    const n = typeof pl.size === 'number'
-      ? pl.size
-      : (Array.isArray(pl.commits) ? pl.commits.length : 0)
-    return `${u} 推送 ${n} 个提交`
+    return `${u} 推送 ${pushCommitCount(e)} 个提交`
   }
   if (e.type === 'CreateEvent') return `${u} 创建 ${pl.ref_type} ${pl.ref || ''}`
   if (e.type === 'WatchEvent') return `${u} Star 了仓库`
@@ -3366,6 +3499,8 @@ onMounted(async () => {
   await loadBranches()
   await loadContent()
   await fetchCommits()
+  // 并行探测当前账号对该仓库的管理权限
+  loadRepoPermissions()
 })
 </script>
 
@@ -4692,6 +4827,38 @@ onMounted(async () => {
 .gl-activity-main { flex: 1; min-width: 0; }
 .gl-activity-title { font-size: 13px; color: var(--text); }
 .gl-activity-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* 列表行可点击查看详情 */
+.gl-tag-row.clickable, .gl-activity-row.clickable { cursor: pointer; }
+.gl-tag-row.clickable:hover, .gl-activity-row.clickable:hover { background: var(--bg-hover); }
+
+/* 详情弹窗 */
+.modal.detail-modal { width: 680px; max-width: 92vw; }
+.detail-meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  margin-top: 10px; font-size: 12px; color: var(--text-secondary);
+}
+.detail-break { word-break: break-all; }
+.detail-markdown {
+  margin-top: 16px; padding: 14px 16px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--bg); max-height: 46vh; overflow-y: auto;
+}
+.detail-assets { margin-top: 16px; }
+.detail-section-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.detail-asset {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.detail-asset:last-child { border-bottom: none; }
+.detail-asset-name { color: var(--text); word-break: break-all; }
+.detail-asset-size { color: var(--text-muted); white-space: nowrap; }
+.detail-commit-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.detail-commit-row:last-child { border-bottom: none; }
+.detail-commit-msg { flex: 1; min-width: 0; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.detail-commit-author { color: var(--text-muted); white-space: nowrap; }
 
 /* 项目信息 / 占位 */
 .gl-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; padding: 16px; font-size: 13px; }

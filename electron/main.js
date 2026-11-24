@@ -760,7 +760,7 @@ app.on('activate', () => {
 // GitHub API 请求（通过 Node https 模块，避免 git 协议依赖）
 // ============================================================
 
-function apiRequest (token, method, urlPath, body, accept) {
+function apiRequest (token, method, urlPath, body, accept, withHeaders) {
   return new Promise((resolve, reject) => {
     const options = {
       hostname: 'api.github.com',
@@ -793,7 +793,8 @@ function apiRequest (token, method, urlPath, body, accept) {
           parsed = data
         }
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(parsed)
+          // 需要分页信息（Link 头）时返回 { data, headers }，默认仍只返回响应体
+          resolve(withHeaders ? { data: parsed, headers: res.headers } : parsed)
         } else {
           // 关键：必须 reject 一个真正的 Error 实例，Electron IPC 才能正确序列化错误信息。
           // 普通对象会被序列化成 [object Object]，用户看不到具体报错。
@@ -902,11 +903,11 @@ ipcMain.handle('config:delete', (_e, key) => {
 // IPC: GitHub API 统一入口
 // ============================================================
 
-ipcMain.handle('api:request', async (_e, { token, method, path, body, accept }) => {
+ipcMain.handle('api:request', async (_e, { token, method, path, body, accept, withHeaders }) => {
   // renderer 侧很多调用（比如 RepoDetailView）传了空 token，这里兜底从 store 拿
   const actualToken = token || getToken() || ''
   try {
-    return await apiRequest(actualToken, method, path, body, accept)
+    return await apiRequest(actualToken, method, path, body, accept, withHeaders)
   } catch (err) {
     // 把结构化错误压平成单个 Error.message 字符串，
     // Electron IPC 才能正确序列化传给渲染进程。

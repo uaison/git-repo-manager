@@ -12,10 +12,10 @@
     </header>
 
     <div class="tabs">
-      <button :class="['tab', activeTab === 'mine' ? 'active' : '']" @click="switchTab('mine')">远程仓库</button>
-      <button :class="['tab', activeTab === 'local' ? 'active' : '']" @click="switchTab('local')">本地仓库</button>
-      <button :class="['tab', activeTab === 'starred' ? 'active' : '']" @click="switchTab('starred')">星标仓库</button>
-      <button :class="['tab', activeTab === 'popular' ? 'active' : '']" @click="switchTab('popular')">热门仓库</button>
+      <button :class="['tab', activeTab === 'mine' ? 'active' : '']" @click="switchTab('mine')">远程仓库<span v-if="tabCounts.mine !== null" class="tab-count">{{ tabCounts.mine }}</span></button>
+      <button :class="['tab', activeTab === 'local' ? 'active' : '']" @click="switchTab('local')">本地仓库<span v-if="tabCounts.local !== null" class="tab-count">{{ tabCounts.local }}</span></button>
+      <button :class="['tab', activeTab === 'starred' ? 'active' : '']" @click="switchTab('starred')">星标仓库<span v-if="tabCounts.starred !== null" class="tab-count">{{ tabCounts.starred }}</span></button>
+      <button :class="['tab', activeTab === 'popular' ? 'active' : '']" @click="switchTab('popular')">热门仓库<span v-if="tabCounts.popular !== null" class="tab-count">{{ tabCounts.popular }}</span></button>
       <div class="spacer"></div>
       <button
         class="btn-search btn-refresh"
@@ -86,8 +86,13 @@
     </div>
 
     <div class="bottom-bar">
-      <span v-if="repos.length">共 {{ repos.length }} 个仓库</span>
-      <span v-if="lastRefresh" class="refresh-at">更新于 {{ formatClock(lastRefresh) }}</span>
+      <span v-if="displayTotal">共 {{ displayTotal }} 个仓库</span>
+      <span v-if="lastRefresh && !searchKeyword" class="refresh-at">更新于 {{ formatClock(lastRefresh) }}</span>
+      <div v-if="!searchKeyword && pageCount > 1" class="pager">
+        <button class="pager-btn" :disabled="page <= 1 || loading" @click="goPage(page - 1)">‹ 上一页</button>
+        <span class="pager-info">{{ page }} / {{ pageCount }}</span>
+        <button class="pager-btn" :disabled="page >= pageCount || loading" @click="goPage(page + 1)">下一页 ›</button>
+      </div>
       <span class="spacer"></span>
       <button v-if="activeTab !== 'local'" class="btn-import" @click="openCreate">➕ 新建仓库</button>
       <button class="btn-import" @click="openManage">⚙️ 管理</button>
@@ -97,8 +102,8 @@
     <!-- 搜索仓库 -->
     <div v-if="showSearch" class="modal-mask" @click.self="showSearch = false">
       <div class="modal search-modal">
-        <h3>🔍 搜索 GitHub 仓库</h3>
-        <p class="modal-desc">支持仓库名、描述与关键字，例如 vue、electron、rust。</p>
+        <h3>🔍 搜索{{ activeTabLabel }}仓库</h3>
+        <p class="modal-desc">仅搜索当前标签页（{{ activeTabLabel }}仓库）的数据，支持仓库名、描述与关键字，例如 vue、electron、rust。</p>
         <input
           ref="searchInput"
           v-model="searchQ"
@@ -176,7 +181,7 @@
     <div v-if="showManage" class="modal-mask" @click.self="showManage = false">
       <div class="modal manage-modal">
         <h3>⚙️ 管理仓库</h3>
-        <p class="modal-desc">当前列表共 {{ repos.length }} 个仓库</p>
+        <p class="modal-desc">当前页共 {{ repos.length }} 个仓库</p>
         <div class="manage-list">
           <div v-if="!repos.length" class="manage-empty">暂无仓库</div>
           <div v-for="r in repos" :key="r.id || r.full_name" class="manage-row">
@@ -226,7 +231,7 @@ const repoListCache = { mine: null, starred: null, local: null, popular: null, t
 
 <script setup>
 import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
-import { getUserRepos, getStarredRepos, getPopularRepos, searchRepositories, createRepo, deleteRepo } from '../api/github.js'
+import { getUserReposPage, getStarredReposPage, getUserRepoTotal, getStarredRepoTotal, getPopularRepos, createRepo, deleteRepo } from '../api/github.js'
 
 const props = defineProps({ username: String })
 const emit = defineEmits(['open-repo', 'logout'])
@@ -241,6 +246,17 @@ const searchQ = ref('')
 const searchKeyword = ref('')
 const searchInput = ref(null)
 const lastRefresh = ref(repoListCache.lastRefresh)
+
+// 分页：每页 30 条，tab 上展示各列表总数
+const PAGE_SIZE = 30
+const PAGE_LIMIT = 20          // 搜索当前 tab 时最多回溯的页数，防止极端账号请求过多
+const page = ref(1)
+const total = ref(0)
+const tabCounts = reactive({ mine: null, starred: null, local: null, popular: null })
+const pageCount = computed(() => Math.max(1, Math.ceil((total.value || repos.value.length) / PAGE_SIZE)))
+const displayTotal = computed(() => searchKeyword.value ? repos.value.length : (total.value || repos.value.length))
+const tabLabels = { mine: '远程', local: '本地', starred: '星标', popular: '热门' }
+const activeTabLabel = computed(() => tabLabels[activeTab.value] || '')
 
 const langColors = {
   JavaScript: '#f1e05a', TypeScript: '#3178c6', Vue: '#41b883', HTML: '#e34c26',
@@ -278,44 +294,135 @@ function formatClock (ts) {
   return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 }
 
-// 每个标签页缓存一份结果，切换 / 返回列表时直接复用，避免重复请求
+// 每个标签页缓存一份分页结果，切换 / 返回列表时直接复用，避免重复请求
 const tabCache = repoListCache
+
+function cacheOf (tab) {
+  const entry = tabCache[tab]
+  return entry && entry.pages ? entry : null
+}
+
+function writePage (tab, p, items, tot) {
+  const old = cacheOf(tab)
+  const entry = { pages: old ? old.pages : {}, page: p, total: tot }
+  entry.pages[p] = items
+  tabCache[tab] = entry
+  tabCounts[tab] = tot
+}
+
+// 命中缓存：恢复当前标签页所在页码
+function applyCached (tab) {
+  const entry = cacheOf(tab)
+  if (!entry || !entry.pages[entry.page]) return false
+  page.value = entry.page
+  total.value = entry.total
+  tabCounts[tab] = entry.total
+  repos.value = entry.pages[entry.page]
+  return true
+}
 
 async function loadRepos (force = false) {
   const tab = activeTab.value
-  if (!force && tabCache[tab]) {
+  if (force) tabCache[tab] = null
+  if (!force && applyCached(tab)) {
     loading.value = false
-    repos.value = tabCache[tab]
+    error.value = ''
     if (tab === 'local') await loadLocalStats()
     return
   }
+  await fetchPage(1)
+}
+
+// 按页拉取当前标签页数据
+async function fetchPage (p) {
+  const tab = activeTab.value
   loading.value = true
   error.value = ''
   try {
-    let list = []
-    let cfg = null
-    if (tab === 'mine') {
-      list = await getUserRepos(1)
-    } else if (tab === 'starred') {
-      list = await getStarredRepos(1)
+    let items = []
+    let tot = 0
+
+    if (tab === 'local') {
+      const cfg = await window.electronAPI.getConfig()
+      const all = cfg.repositories || []
+      tot = all.length
+      p = Math.min(Math.max(1, p), Math.max(1, Math.ceil(tot / PAGE_SIZE)))
+      items = all.slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE)
     } else if (tab === 'popular') {
-      list = await getPopularRepos()
-    } else if (tab === 'local') {
-      cfg = await window.electronAPI.getConfig()
-      list = cfg.repositories || []
+      // 热门仓库取榜单前 60 条后本地分页
+      const all = await getPopularRepos(60)
+      tot = all.length
+      p = Math.min(Math.max(1, p), Math.max(1, Math.ceil(tot / PAGE_SIZE)))
+      items = all.slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE)
+    } else {
+      const entry = cacheOf(tab)
+      if (!entry || !entry.total) {
+        const count = tab === 'mine' ? await getUserRepoTotal() : await getStarredRepoTotal()
+        if (entry) entry.total = count
+        else tabCache[tab] = { pages: {}, page: 1, total: count }
+        tabCounts[tab] = count
+      }
+      tot = cacheOf(tab)?.total || 0
+      const res = tab === 'mine'
+        ? await getUserReposPage(p, PAGE_SIZE)
+        : await getStarredReposPage(p, PAGE_SIZE)
+      items = res.items
+      if (!tot) tot = items.length
+      p = Math.min(Math.max(1, p), Math.max(1, Math.ceil(tot / PAGE_SIZE)))
     }
-    tabCache[tab] = list
+
+    writePage(tab, p, items, tot)
     tabCache.lastRefresh = Date.now()
     lastRefresh.value = tabCache.lastRefresh
     // 切换后已离开该 tab：丢弃过期响应，避免覆盖当前 tab 的列表
     if (tab !== activeTab.value) return
-    repos.value = list
-    if (tab === 'local') await loadLocalStats(cfg)
+    page.value = p
+    total.value = tot
+    repos.value = items
+    if (tab === 'local') await loadLocalStats()
   } catch (e) {
     if (tab === activeTab.value) error.value = formatErr(e)
   } finally {
     if (tab === activeTab.value) loading.value = false
   }
+}
+
+async function goPage (p) {
+  if (loading.value || p < 1 || p > pageCount.value || p === page.value) return
+  const entry = cacheOf(activeTab.value)
+  if (entry && entry.pages[p]) {
+    page.value = p
+    entry.page = p
+    total.value = entry.total
+    repos.value = entry.pages[p]
+    if (activeTab.value === 'local') await loadLocalStats()
+    return
+  }
+  await fetchPage(p)
+}
+
+// 预加载各 tab 总数量，未访问过的 tab 也能展示计数
+async function loadTabCounts () {
+  window.electronAPI.getConfig()
+    .then(cfg => { tabCounts.local = (cfg.repositories || []).length })
+    .catch(() => {})
+  // 当前 tab 的计数由列表加载流程写入，避免同一请求重复发送
+  if (activeTab.value !== 'mine') {
+    getUserRepoTotal().then(n => { tabCounts.mine = n }).catch(() => {})
+  }
+  if (activeTab.value !== 'starred') {
+    getStarredRepoTotal().then(n => { tabCounts.starred = n }).catch(() => {})
+  }
+  if (activeTab.value === 'popular' || cacheOf('popular')) {
+    if (cacheOf('popular')) tabCounts.popular = cacheOf('popular').total
+    return
+  }
+  getPopularRepos(60).then(list => {
+    if (!cacheOf('popular')) {
+      tabCache.popular = { pages: { 1: list.slice(0, PAGE_SIZE) }, page: 1, total: list.length }
+    }
+    tabCounts.popular = list.length
+  }).catch(() => {})
 }
 
 // 本地仓库统计：文件数 / 目录数 / 待提交改动数
@@ -361,15 +468,27 @@ function switchTab (tab) {
   loadRepos()
 }
 
+// 搜索只作用于当前标签页已有的仓库数据
 async function doSearch () {
-  if (!searchQ.value.trim()) return
-  searchKeyword.value = searchQ.value.trim()
+  const kw = searchQ.value.trim()
+  if (!kw) return
+  searchKeyword.value = kw
   showSearch.value = false
   loading.value = true
   error.value = ''
   try {
-    const res = await searchRepositories(searchKeyword.value, 1, 30)
-    repos.value = res.items || []
+    const tab = activeTab.value
+    let pool = []
+    if (tab === 'local') {
+      const cfg = await window.electronAPI.getConfig()
+      pool = cfg.repositories || []
+    } else if (tab === 'popular') {
+      pool = await getPopularRepos(60)
+    } else {
+      pool = await fetchAllRemoteRepos(tab)
+    }
+    const q = kw.toLowerCase()
+    repos.value = pool.filter(r => matchesKeyword(r, q))
   } catch (e) {
     error.value = formatErr(e)
   } finally {
@@ -377,15 +496,46 @@ async function doSearch () {
   }
 }
 
+function matchesKeyword (repo, q) {
+  const fields = [repo.name, repo.full_name, repo.description, repo.language]
+  if (Array.isArray(repo.topics)) fields.push(...repo.topics)
+  return fields.filter(Boolean).some(v => String(v).toLowerCase().includes(q))
+}
+
+// 回溯当前 tab 的全部远程仓库，保证搜索结果完整
+async function fetchAllRemoteRepos (tab) {
+  const out = []
+  const seen = new Set()
+  for (let p = 1; p <= PAGE_LIMIT; p++) {
+    const res = tab === 'mine'
+      ? await getUserReposPage(p, 100)
+      : await getStarredReposPage(p, 100)
+    for (const r of res.items) {
+      const key = r.id || r.full_name
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push(r)
+    }
+    if (!res.hasMore || res.items.length === 0) break
+  }
+  return out
+}
+
 function openSearch () {
   showSearch.value = true
   nextTick(() => searchInput.value?.focus())
 }
 
-function clearSearch () {
+async function clearSearch () {
   searchKeyword.value = ''
   searchQ.value = ''
-  loadRepos()
+  loading.value = false
+  error.value = ''
+  if (applyCached(activeTab.value)) {
+    if (activeTab.value === 'local') await loadLocalStats()
+    return
+  }
+  await loadRepos()
 }
 
 // 手动刷新列表：重新拉取当前标签页数据
@@ -411,10 +561,10 @@ async function importLocal () {
   const list = cfg.repositories || []
   list.push(local)
   await window.electronAPI.setConfig('repositories', list)
-  repos.value = list
-  tabCache.local = list
-  // 立即统计文件/目录数，避免新导入的仓库先显示"…"
-  await loadLocalStats()
+  tabCache.local = null
+  tabCounts.local = list.length
+  // 重新分页加载本地列表，并立即统计文件/目录数
+  await loadRepos(true)
 }
 
 async function removeLocal (repo) {
@@ -423,8 +573,9 @@ async function removeLocal (repo) {
   const cfg = await window.electronAPI.getConfig()
   const list = (cfg.repositories || []).filter(r => r.id !== repo.id)
   await window.electronAPI.setConfig('repositories', list)
-  repos.value = list
-  tabCache.local = list
+  tabCache.local = null
+  tabCounts.local = list.length
+  if (activeTab.value === 'local') await loadRepos(true)
 }
 
 // ===== 新建 / 管理仓库 =====
@@ -478,7 +629,8 @@ async function addLocalEntry (repo, dir) {
       _isLocal: true
     })
     await window.electronAPI.setConfig('repositories', list)
-    tabCache.local = list
+    tabCache.local = null
+    tabCounts.local = list.length
   } catch { /* 记账失败不影响创建结果 */ }
 }
 
@@ -544,10 +696,9 @@ async function confirmDeleteRemote () {
   deleting.value = true
   try {
     await deleteRepo(r.owner.login, r.name)
-    const list = repos.value.filter(x => x !== r)
-    repos.value = list
-    tabCache[activeTab.value] = list
+    tabCache[activeTab.value] = null
     showDelete.value = false
+    await loadRepos(true)
   } catch (e) {
     alert('删除失败：' + formatErr(e))
   } finally {
@@ -565,6 +716,7 @@ onMounted(async () => {
     const cfg = await window.electronAPI.getConfig()
     if (['mine', 'starred', 'local', 'popular'].includes(cfg.listTab)) activeTab.value = cfg.listTab
   } catch { /* 忽略 */ }
+  loadTabCounts()
   await loadRepos()
 })
 
@@ -602,6 +754,12 @@ watch(activeTab, (tab) => {
 }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--text); border-bottom-color: #fd8c73; font-weight: 600; }
+.tab-count {
+  margin-left: 6px; padding: 0 7px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg);
+  font-size: 11px; line-height: 17px; color: var(--text-secondary);
+}
+.tab.active .tab-count { border-color: #fd8c73; color: var(--text); }
 .spacer { flex: 1; }
 .btn-search {
   padding: 6px 14px; border: 1px solid var(--border); background: var(--bg-elevated); border-radius: 6px;
@@ -741,6 +899,15 @@ watch(activeTab, (tab) => {
 .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
 .btn-danger:disabled { opacity: .45; cursor: not-allowed; }
 .refresh-at { font-size: 12px; color: var(--text-muted); }
+.pager { display: flex; align-items: center; gap: 8px; margin-left: 14px; }
+.pager-btn {
+  padding: 3px 10px; font-size: 12px; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg-elevated); color: var(--text);
+}
+.pager-btn:hover:not(:disabled) { background: var(--bg-hover); }
+.pager-btn:disabled { opacity: .45; cursor: not-allowed; }
+.pager-info { font-size: 12px; color: var(--text-secondary); }
 
 .manage-modal { width: 620px; }
 .manage-list { max-height: 52vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }

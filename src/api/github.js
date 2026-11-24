@@ -28,7 +28,7 @@ function isAuthError (message) {
     /未登录/.test(message)
 }
 
-async function request (method, path, body, accept) {
+async function request (method, path, body, accept, withHeaders) {
   if (!_token) {
     notifyAuthExpired('缺少访问令牌')
     const err = new Error('登录已失效，请重新登录')
@@ -36,7 +36,7 @@ async function request (method, path, body, accept) {
     throw err
   }
   try {
-    return await window.electronAPI.apiRequest({ token: _token, method, path, body, accept })
+    return await window.electronAPI.apiRequest({ token: _token, method, path, body, accept, withHeaders })
   } catch (e) {
     const msg = e?.message || String(e)
     if (isAuthError(msg)) {
@@ -60,6 +60,43 @@ export async function getUserRepos (page = 1, perPage = 100) {
 
 export async function getStarredRepos (page = 1, perPage = 100) {
   return request('GET', `/user/starred?page=${page}&per_page=${perPage}`)
+}
+
+// ============ 分页 + 总数（依赖响应头 Link） ============
+// Link: <...&page=5>; rel="last", <...&page=2>; rel="next"
+function lastPageOf (headers) {
+  const link = headers?.link || ''
+  const m = /[?&]page=(\d+)[^>]*>;\s*rel="last"/.exec(link)
+  return m ? Number(m[1]) : null
+}
+
+function hasNextPage (headers) {
+  return /rel="next"/.test(headers?.link || '')
+}
+
+export async function getUserReposPage (page = 1, perPage = 30) {
+  const res = await request('GET', `/user/repos?page=${page}&per_page=${perPage}&sort=updated`, undefined, undefined, true)
+  return { items: Array.isArray(res?.data) ? res.data : [], hasMore: hasNextPage(res?.headers) }
+}
+
+export async function getStarredReposPage (page = 1, perPage = 30) {
+  const res = await request('GET', `/user/starred?page=${page}&per_page=${perPage}`, undefined, undefined, true)
+  return { items: Array.isArray(res?.data) ? res.data : [], hasMore: hasNextPage(res?.headers) }
+}
+
+// per_page=1 时，Link 的最后一页页码即仓库总数
+export async function getUserRepoTotal () {
+  const res = await request('GET', '/user/repos?page=1&per_page=1', undefined, undefined, true)
+  const last = lastPageOf(res?.headers)
+  if (last) return last
+  return Array.isArray(res?.data) ? res.data.length : 0
+}
+
+export async function getStarredRepoTotal () {
+  const res = await request('GET', '/user/starred?page=1&per_page=1', undefined, undefined, true)
+  const last = lastPageOf(res?.headers)
+  if (last) return last
+  return Array.isArray(res?.data) ? res.data.length : 0
 }
 
 export async function getOrgRepos (org, page = 1, perPage = 100) {
